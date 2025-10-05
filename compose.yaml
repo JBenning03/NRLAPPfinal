@@ -1,30 +1,46 @@
-﻿
-
-services:
+﻿services:
   mariadb:
-    image: mariadb:11.8
+    # Miljøvariabler for å sette opp databasen
     environment:
-      MYSQL_ROOT_PASSWORD: "nrlapp321"
-      MYSQL_DATABASE: "nrl"
+      MYSQL_ROOT_PASSWORD: "nrlapp321"   # Root-passord for MariaDB
+      MYSQL_DATABASE: "nrl"              # Databasenavn som opprettes automatisk
+
+    # Volum slik at database-data lagres permanent utenfor containeren
     volumes:
       - mariadb_data:/var/lib/mysql
-    
+
+    # Porter: "3307:3306"
+    #   - Venstre side (3307) er porten på din maskin (host)
+    #   - Høyre side (3306) er standardporten for MariaDB inne i containeren
     ports:
       - "3307:3306"
 
   web:
     build:
-      context: .
-      dockerfile: ./Dockerfile
+      context: .              # Bygger fra mappen du kjører docker-compose i
+      dockerfile: ./Dockerfile # Bruker Dockerfile i prosjektet
+
+    # Gjør at web-tjenesten venter på at mariadb er oppe før den starter
     depends_on:
       - mariadb
+
     environment:
+      # URL og miljø for ASP.NET-applikasjonen
       ASPNETCORE_URLS: "http://+:8080"
       ASPNETCORE_ENVIRONMENT: "Development"
-      
-      ConnectionStrings__DefaultConnection: "Server=mariadb;Port=3306;Database=nrl;User ID=root;Password=nrlapp321;SslMode=None"
+
+      # ConnectionString: sier hvordan appen skal koble til databasen
+      # Viktig: "Server=mariadb" peker på tjenestenavnet i docker-compose,
+      # ikke localhost. Docker sitt interne nettverk gjør at dette fungerer.
+      # "Port=3306" er standardporten til MariaDB inne i nettverket.
+      ConnectionStrings__DefaultConnection: "Server=mariadb;Port=3306;Database=nrl;User ID=root;Password=nrlapp321;SslMode=none;"
+
+    # Porter: "8080:8080"
+    #   - Venstre side (8080) er porten på maskinen din
+    #   - Høyre side (8080) er porten inne i containeren
     ports:
       - "8080:8080"
 
+# Definerer volumet som brukes for å lagre database-data utenfor containeren
 volumes:
   mariadb_data:
