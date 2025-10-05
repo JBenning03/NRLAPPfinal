@@ -1,5 +1,6 @@
 ﻿services:
   mariadb:
+    image: mariadb:11.8
     # Miljøvariabler for å sette opp databasen
     environment:
       MYSQL_ROOT_PASSWORD: "nrlapp321"   # Root-passord for MariaDB
@@ -28,7 +29,7 @@
       # URL og miljø for ASP.NET-applikasjonen
       ASPNETCORE_URLS: "http://+:8080"
       ASPNETCORE_ENVIRONMENT: "Development"
-
+      
       # ConnectionString: sier hvordan appen skal koble til databasen
       # Viktig: "Server=mariadb" peker på tjenestenavnet i docker-compose,
       # ikke localhost. Docker sitt interne nettverk gjør at dette fungerer.
