@@ -1,12 +1,15 @@
+@*skjema for registrering av hinder med validering og kartposisjon*@
 @model NRLApp.Models.ObstacleData
 @{
     ViewData["Title"] = "Registrer luftfartshinder";
 }
 <h2 class="mb-3">@ViewData["Title"]</h2>
 
+@*post skjema som sender inn ny registering*@
 <form asp-action="DataForm" asp-controller="Obstacle" method="post" class="row g-3">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div> @*feilmeldinger*@
+    
+@*skjemafelter som sendes inn: navn, høyde og beskrivelse av hinder*@
     <div class="col-md-6">
         <label asp-for="ObstacleName" class="form-label"></label>
         <input asp-for="ObstacleName" class="form-control" />
@@ -24,12 +27,14 @@
         <textarea asp-for="ObstacleDescription" class="form-control" rows="3"></textarea>
         <span asp-validation-for="ObstacleDescription" class="text-danger"></span>
     </div>
-
+    
+@*kart, markering av posisjon til hindre*@
     <div class="col-12">
         <div id="map" style="height: 400px; border-radius: 8px;"></div>
         <small class="text-muted">Klikk på kartet for å velge posisjon.</small>
     </div>
 
+@*kordinater fra kart (lat/lng)*@
     <input asp-for="Latitude" type="hidden" id="Latitude" />
     <input asp-for="Longitude" type="hidden" id="Longitude" />
     <div class="col-12">
@@ -37,12 +42,14 @@
         <span asp-validation-for="Longitude" class="text-danger"></span>
     </div>
 
+@*Send inn og se registrerte hindre*@    
     <div class="col-12">
         <button type="submit" class="btn btn-primary">Send inn</button>
         <a asp-controller="Obstacle" asp-action="List" class="btn btn-outline-secondary ms-2">Se registrerte</a>
     </div>
 </form>
 
+@*laster leaflet, init kart og markering ved klikk*@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -61,4 +68,4 @@
     });
 </script>
 
-@section Scripts{ <partial name="_ValidationScriptsPartial" /> }
+@section Scripts{ <partial name="_ValidationScriptsPartial" /> @*klientvalidering*@} 
