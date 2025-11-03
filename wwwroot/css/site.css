@@ -207,7 +207,7 @@ body {
 /* Kartet skal være STORT på PC */
 .map-frame {
     width: 100%;
-    height: 500px; /* <-- større kart */
+    height: 600px; /* <-- større kart */
     border-radius: 10px;
     overflow: hidden;
     border: 1px solid #cfcfcf;
@@ -272,4 +272,9 @@ body {
     .grid-tiles {
         grid-template-columns: repeat(2, 1fr);
     }
+}
+
+.main-content {
+    transform: scale(1.2);
+    transform-origin: top center;
 }

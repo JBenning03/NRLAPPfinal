@@ -3,6 +3,30 @@
   "WorkspaceRootPath": "C:\\Users\\storm\\source\\repos\\FINAL\\NRLAPPfinal\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{97B98B7D-AC6B-456C-9467-4FD1E4080199}|NRLApp.csproj|c:\\users\\storm\\source\\repos\\final\\nrlappfinal\\compose.yaml||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{97B98B7D-AC6B-456C-9467-4FD1E4080199}|NRLApp.csproj|solutionrelative:compose.yaml||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{97B98B7D-AC6B-456C-9467-4FD1E4080199}|NRLApp.csproj|c:\\users\\storm\\source\\repos\\final\\nrlappfinal\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{97B98B7D-AC6B-456C-9467-4FD1E4080199}|NRLApp.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{97B98B7D-AC6B-456C-9467-4FD1E4080199}|NRLApp.csproj|c:\\users\\storm\\source\\repos\\final\\nrlappfinal\\controllers\\obstaclecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{97B98B7D-AC6B-456C-9467-4FD1E4080199}|NRLApp.csproj|solutionrelative:controllers\\obstaclecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{97B98B7D-AC6B-456C-9467-4FD1E4080199}|NRLApp.csproj|c:\\users\\storm\\source\\repos\\final\\nrlappfinal\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{97B98B7D-AC6B-456C-9467-4FD1E4080199}|NRLApp.csproj|solutionrelative:properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{97B98B7D-AC6B-456C-9467-4FD1E4080199}|NRLApp.csproj|c:\\users\\storm\\source\\repos\\final\\nrlappfinal\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{97B98B7D-AC6B-456C-9467-4FD1E4080199}|NRLApp.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{97B98B7D-AC6B-456C-9467-4FD1E4080199}|NRLApp.csproj|c:\\users\\storm\\source\\repos\\final\\nrlappfinal\\wwwroot\\css\\site.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{97B98B7D-AC6B-456C-9467-4FD1E4080199}|NRLApp.csproj|solutionrelative:wwwroot\\css\\site.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{97B98B7D-AC6B-456C-9467-4FD1E4080199}|NRLApp.csproj|c:\\users\\storm\\source\\repos\\final\\nrlappfinal\\views\\obstacle\\map.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{97B98B7D-AC6B-456C-9467-4FD1E4080199}|NRLApp.csproj|solutionrelative:views\\obstacle\\map.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
@@ -13,26 +37,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{97B98B7D-AC6B-456C-9467-4FD1E4080199}|NRLApp.csproj|c:\\users\\storm\\source\\repos\\final\\nrlappfinal\\dockerfile||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{97B98B7D-AC6B-456C-9467-4FD1E4080199}|NRLApp.csproj|solutionrelative:dockerfile||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{97B98B7D-AC6B-456C-9467-4FD1E4080199}|NRLApp.csproj|c:\\users\\storm\\source\\repos\\final\\nrlappfinal\\compose.yaml||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{97B98B7D-AC6B-456C-9467-4FD1E4080199}|NRLApp.csproj|solutionrelative:compose.yaml||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{97B98B7D-AC6B-456C-9467-4FD1E4080199}|NRLApp.csproj|c:\\users\\storm\\source\\repos\\final\\nrlappfinal\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{97B98B7D-AC6B-456C-9467-4FD1E4080199}|NRLApp.csproj|solutionrelative:properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{97B98B7D-AC6B-456C-9467-4FD1E4080199}|NRLApp.csproj|c:\\users\\storm\\source\\repos\\final\\nrlappfinal\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{97B98B7D-AC6B-456C-9467-4FD1E4080199}|NRLApp.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{97B98B7D-AC6B-456C-9467-4FD1E4080199}|NRLApp.csproj|c:\\users\\storm\\source\\repos\\final\\nrlappfinal\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{97B98B7D-AC6B-456C-9467-4FD1E4080199}|NRLApp.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{97B98B7D-AC6B-456C-9467-4FD1E4080199}|NRLApp.csproj|c:\\users\\storm\\source\\repos\\final\\nrlappfinal\\controllers\\obstaclecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{97B98B7D-AC6B-456C-9467-4FD1E4080199}|NRLApp.csproj|solutionrelative:controllers\\obstaclecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{97B98B7D-AC6B-456C-9467-4FD1E4080199}|NRLApp.csproj|c:\\users\\storm\\source\\repos\\final\\nrlappfinal\\views\\obstacle\\list.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
@@ -50,7 +54,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 6,
           "Children": [
             {
               "$type": "Bookmark",
@@ -62,20 +66,31 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 5,
+              "Title": "site.css",
+              "DocumentMoniker": "C:\\Users\\storm\\source\\repos\\FINAL\\NRLAPPfinal\\wwwroot\\css\\site.css",
+              "RelativeDocumentMoniker": "wwwroot\\css\\site.css",
+              "ToolTip": "C:\\Users\\storm\\source\\repos\\FINAL\\NRLAPPfinal\\wwwroot\\css\\site.css",
+              "RelativeToolTip": "wwwroot\\css\\site.css",
+              "ViewState": "AgIAAMgAAAAAAAAAAAAwwNAAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2025-11-02T20:28:54.321Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
               "Title": "Map.cshtml",
               "DocumentMoniker": "C:\\Users\\storm\\source\\repos\\FINAL\\NRLAPPfinal\\Views\\Obstacle\\Map.cshtml",
               "RelativeDocumentMoniker": "Views\\Obstacle\\Map.cshtml",
               "ToolTip": "C:\\Users\\storm\\source\\repos\\FINAL\\NRLAPPfinal\\Views\\Obstacle\\Map.cshtml",
               "RelativeToolTip": "Views\\Obstacle\\Map.cshtml",
-              "ViewState": "AgIAABUAAAAAAAAAAAAkwE0AAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAEIAAAAAAAAAAAAAAE0AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-11-02T19:52:22.02Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-02T19:52:22.02Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 7,
               "Title": "_Layout.cshtml",
               "DocumentMoniker": "C:\\Users\\storm\\source\\repos\\FINAL\\NRLAPPfinal\\Views\\Shared\\_Layout.cshtml",
               "RelativeDocumentMoniker": "Views\\Shared\\_Layout.cshtml",
@@ -83,12 +98,11 @@
               "RelativeToolTip": "Views\\Shared\\_Layout.cshtml",
               "ViewState": "AgIAADYAAAAAAAAAAAAAADYAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-11-02T19:41:35.107Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-02T19:41:35.107Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 8,
               "Title": "Dockerfile",
               "DocumentMoniker": "C:\\Users\\storm\\source\\repos\\FINAL\\NRLAPPfinal\\Dockerfile",
               "RelativeDocumentMoniker": "Dockerfile",
@@ -96,25 +110,24 @@
               "RelativeToolTip": "Dockerfile",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-11-02T19:39:06.231Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-02T19:39:06.231Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 0,
               "Title": "compose.yaml",
               "DocumentMoniker": "C:\\Users\\storm\\source\\repos\\FINAL\\NRLAPPfinal\\compose.yaml",
               "RelativeDocumentMoniker": "compose.yaml",
               "ToolTip": "C:\\Users\\storm\\source\\repos\\FINAL\\NRLAPPfinal\\compose.yaml",
               "RelativeToolTip": "compose.yaml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAAABQAAABFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003775|",
               "WhenOpened": "2025-11-02T19:36:58.264Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 1,
               "Title": "appsettings.json",
               "DocumentMoniker": "C:\\Users\\storm\\source\\repos\\FINAL\\NRLAPPfinal\\appsettings.json",
               "RelativeDocumentMoniker": "appsettings.json",
@@ -122,25 +135,23 @@
               "RelativeToolTip": "appsettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-11-02T19:36:23.744Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-02T19:36:23.744Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 2,
               "Title": "ObstacleController.cs",
               "DocumentMoniker": "C:\\Users\\storm\\source\\repos\\FINAL\\NRLAPPfinal\\Controllers\\ObstacleController.cs",
               "RelativeDocumentMoniker": "Controllers\\ObstacleController.cs",
               "ToolTip": "C:\\Users\\storm\\source\\repos\\FINAL\\NRLAPPfinal\\Controllers\\ObstacleController.cs",
               "RelativeToolTip": "Controllers\\ObstacleController.cs",
-              "ViewState": "AgIAAGUAAAAAAAAAAAAiwLYAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAJkAAAAAAAAAAAD4v6UAAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-02T19:16:23.695Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-02T19:16:23.695Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "List.cshtml",
               "DocumentMoniker": "C:\\Users\\storm\\source\\repos\\FINAL\\NRLAPPfinal\\Views\\Obstacle\\List.cshtml",
               "RelativeDocumentMoniker": "Views\\Obstacle\\List.cshtml",
@@ -152,7 +163,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "Thanks.cshtml",
               "DocumentMoniker": "C:\\Users\\storm\\source\\repos\\FINAL\\NRLAPPfinal\\Views\\Obstacle\\Thanks.cshtml",
               "RelativeDocumentMoniker": "Views\\Obstacle\\Thanks.cshtml",
@@ -164,7 +175,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 3,
               "Title": "launchSettings.json",
               "DocumentMoniker": "C:\\Users\\storm\\source\\repos\\FINAL\\NRLAPPfinal\\Properties\\launchSettings.json",
               "RelativeDocumentMoniker": "Properties\\launchSettings.json",
@@ -172,21 +183,19 @@
               "RelativeToolTip": "Properties\\launchSettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-11-02T18:51:25.142Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-02T18:51:25.142Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 4,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\storm\\source\\repos\\FINAL\\NRLAPPfinal\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
               "ToolTip": "C:\\Users\\storm\\source\\repos\\FINAL\\NRLAPPfinal\\Program.cs",
               "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAEUAAAAAAAAAAAAAAEUAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEUAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-02T18:48:25.776Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-02T18:48:25.776Z"
             }
           ]
         },
