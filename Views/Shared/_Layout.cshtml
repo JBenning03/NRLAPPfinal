@@ -1,8 +1,13 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var currentController = (string?)ViewContext.RouteData.Values["controller"] ?? "";
+    // true når vi er på Account-sider (Login/Registrer) → da vil vi skjule menyen
+    var hideMenu = string.Equals(currentController, "Account", StringComparison.OrdinalIgnoreCase);
+}
+<!DOCTYPE html>
 <html lang="no">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>@ViewData["Title"] - NRLApp</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -12,32 +17,44 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-controller="Obstacle" asp-action="Area">NRL Rapportering</a>
+                
+                <a class="navbar-brand d-flex align-items-center gap-2"
+                   asp-controller="@(hideMenu ? "Account" : "Home")"
+                   asp-action="@(hideMenu ? "Login" : "Index")">
+                    <img src="~/img/kartverket-logo.png" alt="Kartverket" class="brand-logo" />
+                </a>
+
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                         data-bs-target="#navbarNav" aria-controls="navbarNav"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Obstacle" asp-action="Area">Skjema</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Obstacle" asp-action="List">Registrerte</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Obstacle" asp-action="Map">Kart</a>
-                        </li>
-                    </ul>
+                    @* Menyen vises KUN når vi IKKE er på Account-sider *@
+                    @if (!hideMenu)
+                    {
+                        <ul class="navbar-nav ms-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Obstacle" asp-action="Area">Skjema</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Obstacle" asp-action="List">Registrerte</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Obstacle" asp-action="Map">Kart</a>
+                            </li>
+                        </ul>
+                    }
                 </div>
+
             </div>
         </nav>
     </header>
 
     <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody() <!-- VIKTIG! -->
+        <main role="main" class="@(hideMenu ? "pt-3 pb-3" : "pb-3")">
+            @RenderBody()
         </main>
     </div>
 

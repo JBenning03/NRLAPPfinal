@@ -1,6 +1,26 @@
+# Visual Studio
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
 bin/
 obj/
-/packages/
-riderModule.iml
-/_ReSharper.Caches/.DS_Store
-.idea/
+
+# Logs
+*.log
+
+# Visual Studio database and cache
+*.db
+*.vsidx
+*.v17
+*.cache
+*.json
+*.pidb
+*.ide
+
+# Publish
+*.publish.xml

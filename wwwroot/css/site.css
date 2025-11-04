@@ -273,3 +273,217 @@ body {
         grid-template-columns: repeat(2, 1fr);
     }
 }
+/* ===========================================
+   LOGIN / REGISTER SIDE – PILOTVERSJON
+   =========================================== */
+
+body {
+    background-color: #f4f4f4; /* myk grå bakgrunn */
+}
+
+/* Kortet */
+.login-card {
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+    /* Overskrift */
+    .login-card h1 {
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+
+/* Felt */
+.form-control-lg {
+    height: 55px; /* store trykkflater */
+    font-size: 1.1rem;
+}
+
+/* Grønn knapp – tydelig og høy kontrast */
+.btn-success.login-primary {
+    height: 60px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    background-color: #0b9444;
+    border-color: #0b9444;
+    transition: background-color 0.2s ease;
+}
+
+    .btn-success.login-primary:hover,
+    .btn-success.login-primary:focus {
+        background-color: #09763a;
+        border-color: #09763a;
+    }
+
+/* Fokusramme (tilgjengelighet) */
+button:focus,
+.form-control:focus,
+a:focus {
+    outline: 3px solid rgba(13, 110, 253, 0.5);
+    outline-offset: 2px;
+}
+
+/* Mindre skjermer */
+@media (max-width: 576px) {
+    .login-card {
+        margin-top: 2rem;
+        padding: 0.5rem;
+    }
+
+    .btn-success.login-primary {
+        height: 56px;
+        font-size: 1.1rem;
+    }
+}
+/* Løft login-kortet litt opp og behold god luft */
+.login-shell {
+    min-height: 60vh;
+    padding-top: 0.5rem;
+}
+
+@media (min-width: 992px) {
+    .login-shell {
+        min-height: 55vh;
+        padding-top: 0.25rem;
+    }
+}
+/* === Ekstra mobil- og iPad-tilpasning === */
+
+/* Øk lesbarhet på små skjermer */
+@media (max-width: 576px) {
+    html {
+        font-size: 17px;
+    }
+}
+
+/* Sikre store trykkflater for input/knapp */
+.form-control-lg {
+    height: 56px;
+}
+
+.btn.login-primary, .btn-success.login-primary {
+    min-height: 56px;
+    font-size: 1.1rem;
+}
+
+/* Gjør knapper alltid full bredde på små skjermer */
+@media (max-width: 768px) {
+    .btn {
+        width: 100%;
+    }
+}
+
+/* Ekstra spacing og fokusmarkering (for touch) */
+.login-shell {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+}
+
+:focus-visible {
+    outline: 3px solid rgba(13, 110, 253, .5);
+    outline-offset: 2px;
+}
+/* ===== iPad / nettbrett-tilpasninger ===== */
+
+/* iPad-vennlig typografi og trykkflater (768–1024px bredde) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    html {
+        font-size: 18px;
+    }
+    /* litt større tekst */
+    .login-card {
+        max-width: 520px;
+    }
+        /* litt bredere kort enn mobil */
+        .login-card h1 {
+            font-size: 2rem;
+        }
+    /* tydelig tittel */
+    .form-control-lg {
+        height: 60px;
+        font-size: 1.125rem;
+    }
+
+    .btn.login-primary, .btn-success.login-primary {
+        min-height: 60px;
+        font-size: 1.15rem;
+    }
+}
+
+/* iPad portrett: litt mer topp-luft for balansert plassering */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+    .login-shell {
+        min-height: 60vh;
+        padding-top: 1rem;
+    }
+}
+
+/* iPad landskap: mindre topp-luft (mer “midt på”) */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+    .login-shell {
+        min-height: 50vh;
+        padding-top: .5rem;
+    }
+}
+
+/* Bruk iOS-safe areas (for notch/kant) – funker kun pga viewport-fit=cover */
+.login-shell {
+    padding-left: max(0.75rem, env(safe-area-inset-left));
+    padding-right: max(0.75rem, env(safe-area-inset-right));
+    padding-top: max(0.5rem, env(safe-area-inset-top));
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+
+/* Touch-enheter: øk vertikal padding på klikkbare elementer */
+@media (pointer: coarse) {
+    .btn, .nav-link {
+        padding-block: 0.75rem;
+    }
+    /* større treffflate */
+}
+
+/* Sørg for at iOS ikke auto-zoomer inputs (vi ligger allerede ?16px, men sikkerhetsnett) */
+input, select, textarea {
+    font-size: 16px;
+}
+/* === Kartverket toppfelt (navbar) === */
+
+.navbar {
+    background-color: #ffffff !important;
+    border-bottom: 1px solid #eaeaea !important;
+    box-shadow: 0 1px 5px rgba(0,0,0,.05);
+    min-height: 60px;
+}
+
+.brand-logo {
+    height: 38px; /* god balanse mot teksten */
+    width: auto;
+    vertical-align: middle;
+    transition: transform 0.2s ease;
+}
+
+    .brand-logo:hover {
+        transform: scale(1.03); /* diskret hover-effekt */
+    }
+
+/* Ryddig containerbredde */
+@media (min-width: 1400px) {
+    .container, .container-fluid {
+        max-width: 1140px;
+    }
+}
+
+/* Diskret footer */
+footer.footer {
+    border-top: 1px solid #e9ecef;
+    color: #6c757d;
+    font-size: .925rem;
+    text-align: center;
+    padding: .75rem 0;
+}
+
+
+
+
+

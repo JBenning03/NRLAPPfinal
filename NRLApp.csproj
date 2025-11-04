@@ -11,12 +11,18 @@
 
 		<ItemGroup>
       <PackageReference Include="Dapper" Version="2.1.66" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.10" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.10" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.10">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
       <PackageReference Include="MySqlConnector" Version="2.4.0" />
     </ItemGroup>
 
 
 		<ItemGroup>
-		  <Folder Include="Views\Home\" />
+		  <Folder Include="wwwroot\img\" />
 		</ItemGroup>
 
 </Project>

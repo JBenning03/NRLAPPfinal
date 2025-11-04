@@ -51,19 +51,25 @@ app.UseSession();
 app.UseAuthorization();
 
 // Startside → Area
-app.MapGet("/", () => Results.Redirect("/obstacle/area"));
+app.MapGet("/", () => Results.Redirect("/Account/Login"));
 
-// Standardrute til ObstacleController
+// Standard MVC-route: Home/Index
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+// Egen kort rute for obstacle, så gamle lenker fortsatt funker
 app.MapControllerRoute(
     name: "obstacles",
     pattern: "obstacle/{action=Area}/{id?}",
     defaults: new { controller = "Obstacle" });
 
+
 // Info i konsollen når appen lytter (nyttig i demo)
 app.Lifetime.ApplicationStarted.Register(() =>
 {
     var urls = app.Urls.Any() ? string.Join(", ", app.Urls) : "http://localhost:5099";
-    Console.WriteLine($"✅ Appen kjører. Åpne: {urls}/obstacle/area");
+    Console.WriteLine($"✔️ Appen kjører. Åpne: {urls}/Account/Login");
 });
 
 app.Run();
