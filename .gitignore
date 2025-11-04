@@ -4,3 +4,19 @@ obj/
 riderModule.iml
 /_ReSharper.Caches/.DS_Store
 .idea/
+# IDE/cache
+.vs/
+.vscode/
+
+# Build
+bin/
+obj/
+
+# VS-cache og diverse
+*.db
+*.db-shm
+*.db-wal
+*.vsidx
+*.v17
+*.cache
+
