@@ -30,11 +30,11 @@ body {
   text-align: start;
 }
 
-/* --- Fargepalett (enkelt å endre) --- */
+/* --- Fargepalett (enkelt Ã¥ endre) --- */
 :root {
     --bg: #f1f1f1;
     --card: #ffffff;
-    --primary: #E53935; /* rød knapp */
+    --primary: #E53935; /* rÃ¸d knapp */
     --primary-dark: #8E5858;
     --text: #222;
 }
@@ -74,7 +74,7 @@ a {
     max-width: 420px;
 }
 
-/* --- Kartområde --- */
+/* --- KartomrÃ¥de --- */
 .map-box {
     height: 420px;
     width: 100%;
@@ -84,7 +84,7 @@ a {
     margin-bottom: 1rem;
 }
 
-/* --- Grid for hinder-type og høydevalg --- */
+/* --- Grid for hinder-type og hÃ¸ydevalg --- */
 .choice-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(140px, 1fr));
@@ -192,7 +192,7 @@ body {
     background: #ddd;
     border-radius: 12px;
     padding: 40px 60px;
-    max-width: 900px; /* <-- gjør kortet bredt nok på PC */
+    max-width: 900px; /* <-- gjÃ¸r kortet bredt nok pÃ¥ PC */
     margin: 60px auto;
     box-shadow: 0 8px 24px rgba(0,0,0,0.08);
     text-align: center;
@@ -204,17 +204,17 @@ body {
         margin-bottom: 24px;
     }
 
-/* Kartet skal være STORT på PC */
+/* Kartet skal vÃ¦re STORT pÃ¥ PC */
 .map-frame {
     width: 100%;
-    height: 500px; /* <-- større kart */
+    height: 600px; /* <-- stÃ¸rre kart */
     border-radius: 10px;
     overflow: hidden;
     border: 1px solid #cfcfcf;
     margin-bottom: 20px;
 }
 
-/* GÅ VIDERE-knapp */
+/* GÃ… VIDERE-knapp */
 .btn-next {
     background: #8E5858;
     color: #fff;
@@ -258,7 +258,7 @@ body {
         background: #b71c1c;
     }
 
-/* Litt responsivitet – så det fortsatt ser OK ut på mindre skjermer */
+/* Litt responsivitet â€“ sÃ¥ det fortsatt ser OK ut pÃ¥ mindre skjermer */
 @media (max-width: 800px) {
     .screen {
         max-width: 95%;
@@ -274,11 +274,11 @@ body {
     }
 }
 /* ===========================================
-   LOGIN / REGISTER SIDE – PILOTVERSJON
+   LOGIN / REGISTER SIDE â€“ PILOTVERSJON
    =========================================== */
 
 body {
-    background-color: #f4f4f4; /* myk grå bakgrunn */
+    background-color: #f4f4f4; /* myk grÃ¥ bakgrunn */
 }
 
 /* Kortet */
@@ -299,7 +299,7 @@ body {
     font-size: 1.1rem;
 }
 
-/* Grønn knapp – tydelig og høy kontrast */
+/* GrÃ¸nn knapp â€“ tydelig og hÃ¸y kontrast */
 .btn-success.login-primary {
     height: 60px;
     font-size: 1.2rem;
@@ -336,7 +336,7 @@ a:focus {
         font-size: 1.1rem;
     }
 }
-/* Løft login-kortet litt opp og behold god luft */
+/* LÃ¸ft login-kortet litt opp og behold god luft */
 .login-shell {
     min-height: 60vh;
     padding-top: 0.5rem;
@@ -350,7 +350,7 @@ a:focus {
 }
 /* === Ekstra mobil- og iPad-tilpasning === */
 
-/* Øk lesbarhet på små skjermer */
+/* Ã˜k lesbarhet pÃ¥ smÃ¥ skjermer */
 @media (max-width: 576px) {
     html {
         font-size: 17px;
@@ -367,7 +367,7 @@ a:focus {
     font-size: 1.1rem;
 }
 
-/* Gjør knapper alltid full bredde på små skjermer */
+/* GjÃ¸r knapper alltid full bredde pÃ¥ smÃ¥ skjermer */
 @media (max-width: 768px) {
     .btn {
         width: 100%;
@@ -386,12 +386,12 @@ a:focus {
 }
 /* ===== iPad / nettbrett-tilpasninger ===== */
 
-/* iPad-vennlig typografi og trykkflater (768–1024px bredde) */
+/* iPad-vennlig typografi og trykkflater (768â€“1024px bredde) */
 @media (min-width: 768px) and (max-width: 1024px) {
     html {
         font-size: 18px;
     }
-    /* litt større tekst */
+    /* litt stÃ¸rre tekst */
     .login-card {
         max-width: 520px;
     }
@@ -419,7 +419,7 @@ a:focus {
     }
 }
 
-/* iPad landskap: mindre topp-luft (mer “midt på”) */
+/* iPad landskap: mindre topp-luft (mer â€œmidt pÃ¥â€) */
 @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
     .login-shell {
         min-height: 50vh;
@@ -427,7 +427,7 @@ a:focus {
     }
 }
 
-/* Bruk iOS-safe areas (for notch/kant) – funker kun pga viewport-fit=cover */
+/* Bruk iOS-safe areas (for notch/kant) â€“ funker kun pga viewport-fit=cover */
 .login-shell {
     padding-left: max(0.75rem, env(safe-area-inset-left));
     padding-right: max(0.75rem, env(safe-area-inset-right));
@@ -435,15 +435,15 @@ a:focus {
     padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
 }
 
-/* Touch-enheter: øk vertikal padding på klikkbare elementer */
+/* Touch-enheter: Ã¸k vertikal padding pÃ¥ klikkbare elementer */
 @media (pointer: coarse) {
     .btn, .nav-link {
         padding-block: 0.75rem;
     }
-    /* større treffflate */
+    /* stÃ¸rre treffflate */
 }
 
-/* Sørg for at iOS ikke auto-zoomer inputs (vi ligger allerede ?16px, men sikkerhetsnett) */
+/* SÃ¸rg for at iOS ikke auto-zoomer inputs (vi ligger allerede ?16px, men sikkerhetsnett) */
 input, select, textarea {
     font-size: 16px;
 }
@@ -487,3 +487,8 @@ footer.footer {
 
 
 
+
+.main-content {
+    transform: scale(1.2);
+    transform-origin: top center;
+}
