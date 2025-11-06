@@ -3,51 +3,40 @@
     ViewData["Title"] = "Registrer deg";
 }
 
-<div class="container d-flex justify-content-center align-items-start">
-    <div class="card shadow-sm register-card" style="max-width: 520px; width:100%;">
+<div class="container d-flex justify-content-center align-items-start login-shell">
+    <div class="card shadow-sm login-card mt-3" style="max-width: 420px; width:100%;">
         <div class="card-body p-4 p-md-5">
-
-            <h1 class="h3 text-center mb-4">@ViewData["Title"]</h1>
+            <h1 class="h3 text-center mb-4">Registrer deg</h1>
 
             <form asp-action="Register" method="post" autocomplete="on" novalidate>
                 @Html.AntiForgeryToken()
 
-                <!-- Oppsummering av valideringsfeil -->
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-                <!-- E-post -->
                 <div class="mb-3">
                     <label asp-for="Email" class="form-label"></label>
                     <input asp-for="Email" class="form-control form-control-lg" inputmode="email" autocomplete="email" />
                     <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
 
-                <!-- Passord -->
                 <div class="mb-3">
                     <label asp-for="Password" class="form-label"></label>
-                    <input asp-for="Password" class="form-control form-control-lg" type="password" autocomplete="new-password" />
+                    <input asp-for="Password" class="form-control form-control-lg" autocomplete="new-password" />
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
 
-                <!-- Bekreft passord -->
                 <div class="mb-4">
                     <label asp-for="ConfirmPassword" class="form-label"></label>
-                    <input asp-for="ConfirmPassword" class="form-control form-control-lg" type="password" autocomplete="new-password" />
+                    <input asp-for="ConfirmPassword" class="form-control form-control-lg" autocomplete="new-password" />
                     <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                 </div>
 
-                <button type="submit" class="btn login-primary btn-lg w-100">
-                    Opprett konto
-                </button>
+                <button type="submit" class="btn btn-success btn-lg w-100 login-primary">Opprett konto</button>
 
                 <div class="text-center mt-3">
-                    <small>
-                        Har du allerede konto?
-                        <a asp-action="Login">Logg inn</a>
-                    </small>
+                    <small>Har du allerede konto? <a asp-action="Login">Logg inn</a></small>
                 </div>
             </form>
-
         </div>
     </div>
 </div>

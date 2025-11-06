@@ -1,4 +1,5 @@
-﻿@{
+﻿@model NRLApp.Models.LoginViewModel
+@{
     ViewData["Title"] = "Logg inn";
 }
 
@@ -12,39 +13,41 @@
                 <div class="alert alert-success" role="alert">@ok</div>
             }
 
-            <form asp-action="Login" method="post" autocomplete="on" novalidate>
+            <form asp-action="Login" method="post" autocomplete="on">
                 @Html.AntiForgeryToken()
 
-                <!-- viser feil fra server -->
-                <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                 <div class="mb-3">
-                    <label for="email" class="form-label">E-post</label>
-                    <input id="email" name="email" type="email"
-                           class="form-control form-control-lg"
-                           required inputmode="email" autocomplete="email" />
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control form-control-lg" inputmode="email" autocomplete="email" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
 
                 <div class="mb-4">
-                    <label for="password" class="form-label">Passord</label>
-                    <input id="password" name="password" type="password"
-                           class="form-control form-control-lg"
-                           required autocomplete="current-password" />
+                    <label asp-for="Password" class="form-label"></label>
+                    <input asp-for="Password" class="form-control form-control-lg" autocomplete="current-password" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
 
-                <button type="submit" class="btn login-primary btn-lg w-100">
-                    Logg inn
-                </button>
-            </form>
+                <div class="form-check mb-3">
+                    <input asp-for="RememberMe" class="form-check-input" />
+                    <label asp-for="RememberMe" class="form-check-label"></label>
+                </div>
 
-            <div class="text-center mt-3">
-                <small>
-                    Har du ikke en konto?
-                    <a asp-action="Register" class="text-primary">Registrer deg</a>
-                </small>
-            </div>
+                <button type="submit" class="btn btn-success btn-lg w-100 login-primary">Logg inn</button>
+
+                <div class="text-center mt-3">
+                    <small>Har du ikke en konto? <a asp-action="Register">Registrer deg</a></small>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
 
 
