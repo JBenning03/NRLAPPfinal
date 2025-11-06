@@ -7,27 +7,38 @@ namespace NRLApp.Controllers
     {
         // GET: /Account/Login
         [HttpGet]
-        public IActionResult Login()
-        {
-            return View();
-        }
+        public IActionResult Login() => View();
 
         // POST: /Account/Login
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Login(string email, string password)
         {
-            // TODO: Koble på ekte autentisering senere.
-            // Midlertidig: send brukeren videre til skjemaet.
-            return RedirectToAction("Area", "Obstacle");
+            // Server-side validering
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+            {
+                ModelState.AddModelError(string.Empty, "Skriv inn e-post og passord.");
+                return View(); // <- viser samme view med feilmelding
+            }
+
+            // Midlertidig “innlogging”
+            bool isAdmin = email.Contains("admin", StringComparison.OrdinalIgnoreCase);
+            bool ok = password == "demo123"; // TODO: bytt til ekte sjekk senere
+
+            if (!ok)
+            {
+                ModelState.AddModelError(string.Empty, "Feil e-post eller passord.");
+                return View();
+            }
+
+            return isAdmin
+                ? RedirectToAction("Dashboard", "Admin")    // stub
+                : RedirectToAction("Area", "Obstacle");     // pilot
         }
 
         // GET: /Account/Register
         [HttpGet]
-        public IActionResult Register()
-        {
-            return View(new RegisterViewModel());
-        }
+        public IActionResult Register() => View(new RegisterViewModel());
 
         // POST: /Account/Register
         [HttpPost]
@@ -35,15 +46,14 @@ namespace NRLApp.Controllers
         public IActionResult Register(RegisterViewModel model)
         {
             if (!ModelState.IsValid)
-            {
-                // Viser valideringsfeil tilbake i skjemaet
                 return View(model);
-            }
 
-            // TODO: Lagre bruker med Identity senere.
-            TempData["RegisterSuccess"] = "Konto opprettet! Du kan nå logge inn.";
+            // TODO: lagre bruker senere (Identity/DB)
+            TempData["RegisterSuccess"] = "Konto opprettet. Logg inn for å fortsette.";
+
             return RedirectToAction("Login");
         }
     }
 }
+
 

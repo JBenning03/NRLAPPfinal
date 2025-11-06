@@ -1,37 +1,50 @@
 ﻿@{
     ViewData["Title"] = "Logg inn";
 }
+
 <div class="container d-flex justify-content-center align-items-start login-shell">
     <div class="card shadow-sm login-card mt-3" style="max-width: 420px; width:100%;">
         <div class="card-body p-4 p-md-5">
             <h1 class="h3 text-center mb-4">Logg inn</h1>
+
             @if (TempData["RegisterSuccess"] is string ok)
             {
                 <div class="alert alert-success" role="alert">@ok</div>
             }
-            <form asp-action="Login" method="post" autocomplete="on">
+
+            <form asp-action="Login" method="post" autocomplete="on" novalidate>
                 @Html.AntiForgeryToken()
+
+                <!-- viser feil fra server -->
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
                 <div class="mb-3">
                     <label for="email" class="form-label">E-post</label>
-                    <input id="email" name="email" type="email" class="form-control form-control-lg"
+                    <input id="email" name="email" type="email"
+                           class="form-control form-control-lg"
                            required inputmode="email" autocomplete="email" />
                 </div>
 
                 <div class="mb-4">
                     <label for="password" class="form-label">Passord</label>
-                    <input id="password" name="password" type="password" class="form-control form-control-lg"
+                    <input id="password" name="password" type="password"
+                           class="form-control form-control-lg"
                            required autocomplete="current-password" />
                 </div>
 
-                <button type="submit" class="btn btn-success btn-lg w-100 login-primary">
+                <button type="submit" class="btn login-primary btn-lg w-100">
                     Logg inn
                 </button>
-
-                <div class="text-center mt-3">
-                    <small>Har du ikke en konto? <a asp-action="Register">Registrer deg</a></small>
-                </div>
             </form>
+
+            <div class="text-center mt-3">
+                <small>
+                    Har du ikke en konto?
+                    <a asp-action="Register" class="text-primary">Registrer deg</a>
+                </small>
+            </div>
         </div>
     </div>
 </div>
+
 

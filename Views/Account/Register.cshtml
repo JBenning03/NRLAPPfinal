@@ -3,14 +3,16 @@
     ViewData["Title"] = "Registrer deg";
 }
 
-<div class="container d-flex justify-content-center align-items-start login-shell">
-    <div class="card shadow-sm login-card mt-3" style="max-width: 420px; width:100%;">
+<div class="container d-flex justify-content-center align-items-start">
+    <div class="card shadow-sm register-card" style="max-width: 520px; width:100%;">
         <div class="card-body p-4 p-md-5">
-            <h1 class="h3 text-center mb-4">Registrer deg</h1>
+
+            <h1 class="h3 text-center mb-4">@ViewData["Title"]</h1>
 
             <form asp-action="Register" method="post" autocomplete="on" novalidate>
                 @Html.AntiForgeryToken()
 
+                <!-- Oppsummering av valideringsfeil -->
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                 <!-- E-post -->
@@ -34,14 +36,18 @@
                     <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                 </div>
 
-                <button type="submit" class="btn btn-success btn-lg w-100 login-primary">
+                <button type="submit" class="btn login-primary btn-lg w-100">
                     Opprett konto
                 </button>
 
                 <div class="text-center mt-3">
-                    <small>Har du allerede konto? <a asp-action="Login">Logg inn</a></small>
+                    <small>
+                        Har du allerede konto?
+                        <a asp-action="Login">Logg inn</a>
+                    </small>
                 </div>
             </form>
+
         </div>
     </div>
 </div>

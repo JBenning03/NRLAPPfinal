@@ -4,21 +4,23 @@ namespace NRLApp.Models
 {
     public class RegisterViewModel
     {
-
         [Required(ErrorMessage = "E-post er påkrevd")]
         [EmailAddress(ErrorMessage = "Ugyldig e-postadresse")]
         [Display(Name = "E-post")]
-        public string Email { get; set; } = string.Empty;
+        public string Email { get; set; } = "";
 
         [Required(ErrorMessage = "Passord er påkrevd")]
-        [StringLength(100, ErrorMessage = "Passord må være minst {2} tegn", MinimumLength = 8)]
+        [StringLength(100, MinimumLength = 6,
+            ErrorMessage = "Passord må være minst {2} tegn")]
+        [DataType(DataType.Password)]
         [Display(Name = "Passord")]
-        public string Password { get; set; } = string.Empty;
+        public string Password { get; set; } = "";
 
         [Required(ErrorMessage = "Bekreft passord")]
-        [Compare(nameof(Password), ErrorMessage = "Passordene er ikke like")]
+        [DataType(DataType.Password)]
         [Display(Name = "Bekreft passord")]
-        public string ConfirmPassword { get; set; } = string.Empty;
+        [Compare(nameof(Password), ErrorMessage = "Passordene er ikke like")]
+        public string ConfirmPassword { get; set; } = "";
     }
 }
 

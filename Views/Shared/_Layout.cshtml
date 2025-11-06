@@ -18,10 +18,15 @@
         <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 
-                <a class="navbar-brand d-flex align-items-center gap-2"
+                <a class="navbar-brand d-flex align-items-center"
                    asp-controller="@(hideMenu ? "Account" : "Home")"
                    asp-action="@(hideMenu ? "Login" : "Index")">
-                    <img src="~/img/kartverket-logo.png" alt="Kartverket" class="brand-logo" />
+
+                    <img src="~/img/standard_Luftambulansen.png"
+                         alt="Logo"
+                         height="45"
+                         class="me-2"
+                         asp-append-version="true" />
                 </a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"

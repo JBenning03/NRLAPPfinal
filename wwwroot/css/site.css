@@ -1,3 +1,117 @@
+/* =========================
+   NLA (Luftambulanse)-tema
+   ========================= */
+:root {
+    --nla-blue: #003E7E; /* primær */
+    --nla-blue-600: #00346A; /* hover/dark */
+    --nla-red: #D7261E; /* aksent/varsler */
+    --nla-red-600: #B11F19; /* hover/dark */
+    --surface: #FFFFFF; /* kort/innhold */
+    --bg: #F4F6FA; /* lys bakgrunn */
+    --text: #1E1E1E; /* primær tekst */
+    --muted: #6B7280; /* sekundær tekst */
+    --ring: #0EA5E9; /* fokusring */
+}
+
+/* Basestil */
+html, body {
+    background: var(--bg);
+    color: var(--text);
+}
+
+a {
+    color: var(--nla-blue);
+    text-decoration: none;
+}
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+/* Fokus (UU) – tydelig fokusramme for tastaturbrukere */
+:focus {
+    outline: 2px solid var(--ring) !important;
+    outline-offset: 2px !important;
+}
+
+.form-control:focus {
+    border-color: var(--nla-blue);
+    box-shadow: 0 0 0 .2rem rgba(0,62,126,.15);
+}
+
+/* Navbar / topp */
+.navbar-light {
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    color: var(--nla-blue) !important;
+}
+
+/* Kort (login/registrering) */
+.login-card,
+.register-card {
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 6px 18px rgba(0,0,0,.06);
+    max-width: 520px;
+    width: 100%;
+    margin: 3rem auto 2rem;
+}
+
+@media (max-width: 576px) {
+    .login-card, .register-card {
+        margin: 2rem 1rem;
+    }
+}
+
+/* Knapper – blå primær + rød aksent */
+.btn.login-primary,
+.btn.nla-primary {
+    background: var(--nla-blue);
+    border-color: var(--nla-blue);
+    color: #fff;
+}
+
+    .btn.login-primary:hover,
+    .btn.nla-primary:hover {
+        background: var(--nla-blue-600);
+        border-color: var(--nla-blue-600);
+    }
+
+.btn.nla-accent {
+    background: var(--nla-red);
+    border-color: var(--nla-red);
+    color: #fff;
+}
+
+    .btn.nla-accent:hover {
+        background: var(--nla-red-600);
+        border-color: var(--nla-red-600);
+    }
+
+/* Skjemeelementer – større flater, god luft */
+.form-label {
+    font-weight: 600;
+}
+
+.form-control.form-control-lg {
+    padding-top: .9rem;
+    padding-bottom: .9rem;
+    border-radius: .6rem;
+}
+
+/* Alerts */
+.alert-success {
+    background: #E8F6FF;
+    border: 1px solid #CDEBFF;
+    color: #0B4A80;
+    border-radius: .6rem;
+}
+
 html {
   font-size: 14px;
 }
