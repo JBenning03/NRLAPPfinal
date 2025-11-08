@@ -55,7 +55,7 @@ a {
 }
 
 .brand-logo {
-    height: 38px;
+    height: 70px;
     width: auto;
     vertical-align: middle;
     transition: transform .2s ease;
@@ -359,4 +359,15 @@ body {
     background: var(--bg);
     color: var(--text);
 }
+.logout-btn {
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    transition: all 0.15s ease;
+}
+
+    .logout-btn:hover {
+        background-color: #B11F19;
+        border-color: #B11F19;
+        color: #fff;
+    }
 
