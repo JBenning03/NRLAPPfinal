@@ -3,13 +3,18 @@
     // true når vi er på Account-sider (Login/Registrer) → da vil vi skjule menyen
     var hideMenu = string.Equals(currentController, "Account", StringComparison.OrdinalIgnoreCase);
 }
+
 <!DOCTYPE html>
 <html lang="no">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>@ViewData["Title"] - NRLApp</title>
+
+    <!-- CSS: Bootstrap først, deretter vår egen -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <!-- (valgfritt) Bootstrap Icons for logout-ikon -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 
@@ -17,29 +22,24 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                
-                <a class="navbar-brand d-flex align-items-center"
-                   asp-controller="@(hideMenu ? "Account" : "Home")"
-                   asp-action="@(hideMenu ? "Login" : "Index")">
+                <!-- Logo (ikke lenke) -->
+                <span class="navbar-brand d-flex align-items-center">
+                    <img src="~/img/standard_Luftambulansen.png" class="brand-logo me-2" alt="Logo" />
+                </span>
 
-                    <img src="~/img/standard_Luftambulansen.png"
-                         alt="Logo"
-                         height="60"
-                         class="me-2"
-                         asp-append-version="true" />
-                </a>
-
+                <!-- Toggler for mobil -->
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                         data-bs-target="#navbarNav" aria-controls="navbarNav"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
+                <!-- Kollapsbart område -->
                 <div class="collapse navbar-collapse" id="navbarNav">
                     @* Menyen vises KUN når vi IKKE er på Account-sider *@
                     @if (!hideMenu)
                     {
-                        <ul class="navbar-nav ms-auto">
+                        <ul class="navbar-nav">
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Obstacle" asp-action="Area">Skjema</a>
                             </li>
@@ -50,9 +50,21 @@
                                 <a class="nav-link" asp-controller="Obstacle" asp-action="Map">Kart</a>
                             </li>
                         </ul>
+
+                        @* Logg ut-knapp til høyre – kun når innlogget *@
+                        @if (User?.Identity?.IsAuthenticated == true)
+                        {
+                            <div class="ms-auto d-flex align-items-center">
+                                <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-outline-danger btn-sm logout-btn">
+                                        <i class="bi bi-box-arrow-right"></i> Logg ut
+                                    </button>
+                                </form>
+                            </div>
+                        }
                     }
                 </div>
-
             </div>
         </nav>
     </header>
@@ -69,6 +81,7 @@
         </div>
     </footer>
 
+    <!-- JS -->
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
