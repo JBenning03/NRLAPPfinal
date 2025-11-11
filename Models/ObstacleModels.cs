@@ -1,14 +1,20 @@
 ﻿namespace NRLApp.Models
 {
-    public enum ObstacleType { Building, Mast, WindTurbine, PowerLine, Crane, Other }
-    public enum HeightBand { H0_15, H15_30, H30_50, H50_75, H75_100, H100Plus }
-
-    public sealed class ObstacleWizardState
+    public sealed class DrawState
     {
-        public double? CenterLat { get; set; }
-        public double? CenterLng { get; set; }
-        public int? RadiusMeters { get; set; }
-        public ObstacleType? Type { get; set; }
-        public HeightBand? Height { get; set; }
+        // GeoJSON FeatureCollection (string)
+        public string? GeoJson { get; set; }
+    }
+
+    public sealed class ObstacleMetaVm
+    {
+        // Vises i Meta.cshtml
+        public string? ObstacleName { get; set; }
+
+        public double? HeightValue { get; set; }   // det brukeren taster
+        public string HeightUnit { get; set; } = "m"; // "m" eller "ft"
+
+        public string? Description { get; set; }
+        public bool SaveAsDraft { get; set; }
     }
 }

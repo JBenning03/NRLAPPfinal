@@ -1,0 +1,43 @@
+﻿@model NRLApp.Models.ObstacleMetaVm
+@{
+    ViewData["Title"] = "Registrer hinder";
+}
+
+<div class="screen" style="max-width:800px;margin:0 auto;">
+    <h2>REGISTRER HINDER</h2>
+
+    <form asp-action="Meta" method="post" class="row g-3">
+        <div class="col-12">
+            <label class="form-label fw-bold">Hinder:</label>
+            <input asp-for="ObstacleName" class="form-control" />
+            <span asp-validation-for="ObstacleName" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label fw-bold">Høyde:</label>
+            <input asp-for="HeightValue" class="form-control" type="number" step="any" />
+            <span asp-validation-for="HeightValue" class="text-danger"></span>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label fw-bold d-block">Enhet:</label>
+            <select asp-for="HeightUnit" class="form-select">
+                <option value="m">Meter (m)</option>
+                <option value="ft">Feet (ft)</option>
+            </select>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label fw-bold">Beskrivelse:</label>
+            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+        </div>
+
+        <div class="col-12 d-flex justify-content-between mt-2">
+            <button name="action" value="draft" class="btn btn-outline-secondary">Lagre utkast</button>
+            <button type="submit" class="btn btn-success">Send inn</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

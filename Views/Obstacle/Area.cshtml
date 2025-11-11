@@ -2,83 +2,166 @@
     ViewData["Title"] = "Registrer område";
 }
 
-<!-- Leaflet -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <div class="screen">
     <h2>REGISTRER OMRÅDE</h2>
 
-    <form asp-action="Area" method="post">
-        @Html.AntiForgeryToken()
+    <form asp-action="Area" method="post" class="map-form">
+        <input type="hidden" name="geoJson" id="geoJson" />
 
-        <!-- Kart -->
-        <div class="map-frame">
-            <div id="map" style="width:100%;height:100%"></div>
+        <div class="map-and-tools">
+            <div id="map" class="map-box"></div>
+
+            <div class="tools">
+                <div class="tool-title">VERKTØY</div>
+                <button type="button" id="btnPoint" class="tool-btn">Markør</button>
+                <button type="button" id="btnLine" class="tool-btn">Linje</button>
+                <button type="button" id="btnPoly" class="tool-btn">Område</button>
+                <hr />
+                <button type="button" id="btnUndo" class="tool-btn">Angre siste</button>
+                <button type="button" id="btnClear" class="tool-btn">Nullstill</button>
+            </div>
         </div>
 
-        <!-- Radius-slider (5–100 m) -->
-        <div style="max-width: 500px; margin: 0 auto 10px;">
-            <label class="form-label">Radius (meter): <strong><span id="radiusLabel">30</span> m</strong></label>
-            <input id="radiusInput" type="range" min="5" max="100" step="1" value="30" class="form-range" />
+        <div class="actions">
+            <button type="submit" class="primary">Gå videre</button>
         </div>
-
-        <!-- Skjulte felt som sendes til controlleren -->
-        <input type="hidden" name="CenterLat" id="centerLat" />
-        <input type="hidden" name="CenterLng" id="centerLng" />
-        <input type="hidden" name="RadiusMeters" id="radiusMeters" value="30" />
-
-        <button type="submit" class="btn-next">GÅ VIDERE</button>
     </form>
+
+    @if (TempData["Error"] is string e)
+    {
+        <div class="text-danger mt-2">@e</div>
+    }
 </div>
 
-<script>
-    // Start nær Kristiansand sentrum
-    const start = [58.1467, 7.9956];
-    const map = L.map('map').setView(start, 15);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
 
-    // Blå radius-sirkel (ingen markør)
-    let radiusMeters = 30;
-    let center = start;
-    const circle = L.circle(center, {
-        radius: radiusMeters,
-        color: '#1e88e5',      // blå kant
-        weight: 2,
-        fillColor: '#1e88e5',  // blå fyll
-        fillOpacity: 0.20
-    }).addTo(map);
-
-    // Inputs/label
-    const latEl = document.getElementById('centerLat');
-    const lngEl = document.getElementById('centerLng');
-    const radiusEl = document.getElementById('radiusMeters');
-    const slider = document.getElementById('radiusInput');
-    const label = document.getElementById('radiusLabel');
-
-    function syncHidden() {
-        latEl.value = center[0].toFixed(6);
-        lngEl.value = center[1].toFixed(6);
-        radiusEl.value = radiusMeters;
-        label.textContent = radiusMeters;
+<style>
+    .map-form {
+        max-width: 1100px;
+        margin: 0 auto;
     }
-    syncHidden();
 
-    // Klikk i kart: flytt sirkelen
-    map.on('click', e => {
-        center = [e.latlng.lat, e.latlng.lng];
-        circle.setLatLng(e.latlng);
-        syncHidden();
-    });
+    .map-and-tools {
+        display: flex;
+        gap: 18px;
+        align-items: flex-start;
+    }
 
-    // Slider: juster radius live
-    slider.addEventListener('input', e => {
-        const v = parseInt(e.target.value, 10);
-        if (!Number.isNaN(v)) {
-            radiusMeters = v;
-            circle.setRadius(radiusMeters);
-            label.textContent = radiusMeters;
-            radiusEl.value = radiusMeters;
+    .map-box {
+        width: 800px;
+        height: 380px;
+        border-radius: 10px;
+    }
+
+    .tools {
+        width: 200px;
+        background: #eee;
+        border-radius: 10px;
+        padding: 12px;
+    }
+
+    .tool-title {
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .tool-btn {
+        display: block;
+        width: 100%;
+        margin-bottom: 8px;
+        padding: 8px 10px;
+        border: 0;
+        background: #fff;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+        .tool-btn:hover {
+            background: #f3f3f3;
         }
-    });
+
+    .actions {
+        text-align: center;
+        margin-top: 16px;
+    }
+
+    .primary {
+        background: #1f6f2e;
+        color: #fff;
+        border: 0;
+        border-radius: 8px;
+        padding: 10px 18px;
+        font-weight: 700;
+    }
+</style>
+
+<script>
+    (function() {
+        // Start i Kristiansand
+        const map = L.map('map').setView([58.1467, 7.9956], 14);
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
+
+        // Samle alt brukeren tegner i ett FeatureGroup
+        const drawn = new L.FeatureGroup();
+        map.addLayer(drawn);
+
+        // Leaflet.Draw-kontroller (vi styrer hvilke knapper som er aktive med våre sideknapper)
+        const drawControl = new L.Control.Draw({
+            draw: {
+                marker: { repeatMode: true },
+                polyline: { shapeOptions: { color: '#2c6bed', weight: 3 } },
+                polygon: { allowIntersection: false, shapeOptions: { color: '#2c6bed', weight: 2, fillOpacity: 0.15 } },
+                circle: false, rectangle: false, circlemarker: false
+            },
+            edit: { featureGroup: drawn }
+        });
+
+        // Vi legger ikke toolbaren i kartet; vi trig­ger verktøy via knapper på høyre side.
+        // map.addControl(drawControl); // <- ikke nødvendig
+
+        let active; // "marker" | "polyline" | "polygon"
+
+        function startDraw(mode) {
+            active = mode;
+            let drawer;
+            if (mode === "marker") {
+                drawer = new L.Draw.Marker(map, drawControl.options.draw.marker);
+            } else if (mode === "polyline") {
+                drawer = new L.Draw.Polyline(map, drawControl.options.draw.polyline);
+            } else if (mode === "polygon") {
+                drawer = new L.Draw.Polygon(map, drawControl.options.draw.polygon);
+            }
+            if (drawer) drawer.enable();
+        }
+
+        // Håndter resultat når noe blir tegnet ferdig
+        map.on(L.Draw.Event.CREATED, function (e) {
+            drawn.addLayer(e.layer);
+            // tillat å fortsette å legge på flere markører/punkter om ønskelig
+            if (active === "marker") startDraw("marker");
+        });
+
+        document.getElementById('btnPoint').onclick = () => startDraw("marker");
+        document.getElementById('btnLine').onclick  = () => startDraw("polyline");
+        document.getElementById('btnPoly').onclick  = () => startDraw("polygon");
+
+        document.getElementById('btnUndo').onclick  = () => {
+            // Fjern siste tegnet lag
+            const layers = Object.values(drawn._layers);
+            if (layers.length > 0) drawn.removeLayer(layers[layers.length-1]);
+        };
+        document.getElementById('btnClear').onclick = () => drawn.clearLayers();
+
+        // Før submit: pakk alt som GeoJSON FeatureCollection i skjemaet
+        document.querySelector('form').addEventListener('submit', function () {
+            const fc = drawn.toGeoJSON();
+            document.getElementById('geoJson').value = JSON.stringify(fc);
+        });
+
+        setTimeout(()=>map.invalidateSize(), 80);
+    })();
 </script>

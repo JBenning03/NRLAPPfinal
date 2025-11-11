@@ -1,4 +1,13 @@
 {
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:49416",
+      "sslPort": 44392
+    }
+  },
   "profiles": {
     "IIS Express": {
       "commandName": "IISExpress",
@@ -9,33 +18,14 @@
     },
     "NRLApp": {
       "commandName": "Project",
-      "launchBrowser": true,
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      },
       "dotnetRunMessages": true,
-      "applicationUrl": "http://0.0.0.0:5289;https://0.0.0.0:7243"
-    },
-    "Container (Dockerfile)": {
-      "commandName": "Docker",
       "launchBrowser": true,
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "applicationUrl": "http://localhost:5289;https://localhost:7243",
       "environmentVariables": {
-        "ASPNETCORE_HTTPS_PORTS": "8081",
-        "ASPNETCORE_HTTP_PORTS": "8080",
-        "ConnectionStrings__DefaultConnection": "Server=host.docker.internal;Port=3307;Database=nrlapp;User Id=nrl_user;Password=nrl_pass;SslMode=None;TreatTinyAsBoolean=false"
-      },
-      "publishAllPorts": true,
-      "useSSL": true
-    }
-  },
-  "$schema": "https://json.schemastore.org/launchsettings.json",
-  "iisSettings": {
-    "windowsAuthentication": false,
-    "anonymousAuthentication": true,
-    "iisExpress": {
-      "applicationUrl": "http://localhost:49416",
-      "sslPort": 44392
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ConnectionStrings__DefaultConnection": "Server=127.0.0.1;Port=3306;Database=nrlapp;User ID=nrl_user;Password=Demo321;SslMode=none;TreatTinyAsBoolean=true;CharSet=utf8mb4"
+      }
     }
   }
 }
+

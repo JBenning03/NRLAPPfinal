@@ -2,13 +2,12 @@
 {
     public sealed class ObstacleListItem
     {
-        public long Id { get; set; }
-        public double CenterLat { get; set; }
-        public double CenterLng { get; set; }
-        public int RadiusMeters { get; set; }
-        public string Type { get; set; } = "";
-        public int HeightMinMeters { get; set; }
-        public int? HeightMaxMeters { get; set; }
+        public int Id { get; set; }
+
+        // Ny feltnavn (må stemme med List.cshtml)
+        public string? ObstacleName { get; set; }
+        public int? HeightMeters { get; set; }
+        public bool IsDraft { get; set; }
         public DateTime CreatedUtc { get; set; }
     }
 }

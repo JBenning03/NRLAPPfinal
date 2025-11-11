@@ -1,47 +1,39 @@
 @model IEnumerable<NRLApp.Models.ObstacleListItem>
 @{
-    ViewData["Title"] = "Registrerte hindre";
+    ViewData["Title"] = "Registrerte hindere";
 }
 
-<div class="screen">
-    <h2>REGISTRERTE HINDRE</h2>
+<h2>Registrerte hindere</h2>
 
-    @if (!Model.Any())
-    {
-        <p class="text-muted">Ingen innsendelser ennå.</p>
-    }
-    else
-    {
-        <table class="table table-striped table-sm align-middle">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Tid (UTC)</th>
-                    <th>Type</th>
-                    <th>Høyde</th>
-                    <th>Radius</th>
-                    <th>Lat</th>
-                    <th>Lng</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var x in Model)
-                {
-                    <tr>
-                        <td>@x.Id</td>
-                        <td>@x.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</td>
-                        <td>@x.Type</td>
-                        <td>@(x.HeightMaxMeters is null ? $"{x.HeightMinMeters} m+" : $"{x.HeightMinMeters}–{x.HeightMaxMeters} m")</td>
-                        <td>@x.RadiusMeters m</td>
-                        <td>@x.CenterLat</td>
-                        <td>@x.CenterLng</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-
-    <div style="margin-top:12px;">
-        <a class="btn btn-outline-secondary" href="@Url.Action("Area", "Obstacle")">Registrer nytt</a>
-    </div>
-</div>
+<table class="table table-striped align-middle">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Hinder</th>
+            <th>Høyde (m)</th>
+            <th>Status</th>
+            <th>Registrert</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var x in Model)
+        {
+            <tr>
+                <td>@x.Id</td>
+                <td>@(string.IsNullOrWhiteSpace(x.ObstacleName) ? "(uten navn)" : x.ObstacleName)</td>
+                <td>@(x.HeightMeters?.ToString() ?? "-")</td>
+                <td>
+                    @if (x.IsDraft)
+                    {
+                        <span class="badge bg-secondary">Utkast</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">Innsendt</span>
+                    }
+                </td>
+                <td>@x.CreatedUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+            </tr>
+        }
+    </tbody>
+</table>
