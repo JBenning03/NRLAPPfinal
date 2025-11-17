@@ -1,28 +1,35 @@
-﻿version: "2.4"
+﻿version: "3.9"
+
 services:
-  mariadb:
+  db:
     image: mariadb:11
     container_name: nrl-mariadb
     restart: unless-stopped
     environment:
+      MYSQL_ROOT_PASSWORD: root_pass   # velg noe, men husk det
       MYSQL_DATABASE: nrl
       MYSQL_USER: nrl_user
       MYSQL_PASSWORD: nrl_pass
-      MYSQL_ROOT_PASSWORD: changeMeRoot
     ports:
-      - "3307:3306"
+      - "3307:3306"   # host:container
     volumes:
-      - dbdata:/var/lib/mysql
+      - nrl-db:/var/lib/mysql
+      - ./db-init:/docker-entrypoint-initdb.d:ro
+
   nrlapp:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nrlapp
     depends_on:
-      - mariadb
+      - db
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=mariadb;Port=3306;Database=nrl;User Id=nrl_user;Password=nrl_pass;SslMode=none;TreatTinyAsBoolean=true;CharSet=utf8mb4
+      ASPNETCORE_ENVIRONMENT: "Development"
+      # Connection string INNE I CONTAINEREN (db = service-navn)
+      ConnectionStrings__DefaultConnection: "Server=db;Port=3306;Database=nrl;User Id=nrl_user;Password=nrl_pass;SslMode=none;TreatTinyAsBoolean=true;CharSet=utf8mb4"
     ports:
-      - "8080:8080"
-      - "8081:8081"
+      - "8080:8080"   # åpne appen på http://localhost:8080
 
 volumes:
-  dbdata:
+  nrl-db:
+

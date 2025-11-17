@@ -12,8 +12,9 @@ using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 var builder = WebApplication.CreateBuilder(args);
 
 // === DATABASE (MySQL/MariaDB via Pomelo) ===
-// Leser connection string "DefaultConnection" fra appsettings / miljøvariabler
 var cs = builder.Configuration.GetConnectionString("DefaultConnection");
+Console.WriteLine($"[DEBUG-CONN] {cs}");
+
 
 // VIKTIG: Ikke bruk AutoDetect (krever live-DB); spesifiser MariaDB-versjon uten å koble til.
 var serverVersion = ServerVersion.Create(new Version(11, 0, 0), ServerType.MariaDb);

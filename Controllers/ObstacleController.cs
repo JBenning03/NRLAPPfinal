@@ -136,7 +136,8 @@ SELECT id,
        created_utc      AS CreatedUtc
 FROM obstacles
 ORDER BY id DESC;";
-            var rows = await con.QueryAsync<dynamic>(sql);
+            // Be Dapper mappe direkte til ObstacleListItem så modellen stemmer med viewet
+            var rows = await con.QueryAsync<ObstacleListItem>(sql);
             return View(rows);
         }
     }
