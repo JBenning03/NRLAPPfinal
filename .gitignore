@@ -19,4 +19,6 @@ obj/
 *.vsidx
 *.v17
 *.cache
+*.user
+
 
