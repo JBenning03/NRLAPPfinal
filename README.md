@@ -54,12 +54,12 @@ Bootstrap brukes for enkel og responsiv layout sammen med KI (ChatGPT)
  ###
  Denne delen definerer tilkoblingen til MariaDB-databasen.
 
- **Server** Navn til database-serveren, som i dette tilfellet er satt til "127.0.0.1". 
- **Port** Porten vi bruker for er 3307.
- **Database** Navnet på databasen som applikasjonen skal bruke, satt til "nrl"
- **User ID** Brukernavnet for å koble til databasen, satt til "nrl_user".
- **Password** Passordet for brukeren, satt til "nrl_pass".
- **SslMode** Satt til "None" fordi den ikke brukes.
+ **Server** er satt til "127.0.0.1". 
+ **Port** er satt til 3307.
+ **Database** er satt til "nrl"
+ **User ID** for å koble til databasen, satt til "nrl_user".
+ **Password** for brukeren, satt til "nrl_pass".
+ **SslMode** er satt til "None" fordi den ikke brukes.
 
  ### Logging
  Definerer hvor detaljerte loggene skal være under kjøring av applikasjonen.
