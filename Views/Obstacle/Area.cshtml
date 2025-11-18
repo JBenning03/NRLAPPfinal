@@ -158,9 +158,49 @@
 
 <script>
     (function () {
-        const map = L.map('map').setView([58.1467, 7.9956], 14);
+        // Standard-posisjon (Kristiansand) hvis geolokasjon ikke funker
+        const defaultCenter = [58.1467, 7.9956];
+        const defaultZoom = 14;
+
+        // Opprett kartet med default view først
+        const map = L.map('map').setView(defaultCenter, defaultZoom);
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
             { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
+
+        // Forsøk å bruke nettleserens geolokasjon (som Google Maps)
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                function (pos) {
+                    const userLat = pos.coords.latitude;
+                    const userLng = pos.coords.longitude;
+                    const userLatLng = [userLat, userLng];
+
+                    // Flytt kartet til brukerens posisjon
+                    map.setView(userLatLng, 15);
+
+                    // Liten markør for "du er her"
+                    L.circleMarker(userLatLng, {
+                        radius: 6,
+                        color: '#D7261E',
+                        fillColor: '#D7261E',
+                        fillOpacity: 0.9,
+                        weight: 2
+                    })
+                        .addTo(map)
+                        .bindPopup("Du er her")
+                        .openPopup();
+                },
+                function (err) {
+                    console.warn("Geolocation feilet eller ble nektet:", err);
+                    // gjør ingenting → vi beholder defaultCenter
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 60000
+                }
+            );
+        }
 
         const drawn = new L.FeatureGroup();
         map.addLayer(drawn);
@@ -241,3 +281,4 @@
         });
     })();
 </script>
+

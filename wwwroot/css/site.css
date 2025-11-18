@@ -370,3 +370,32 @@ body {
         border-color: #B11F19;
         color: #fff;
     }
+/* ==== Brukerinfo i toppmeny (innlogget bruker) ==== */
+
+.user-info {
+    max-width: 220px;
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background-color: var(--nla-blue);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+}
+
+.user-name {
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: #003050;
+    max-width: 170px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

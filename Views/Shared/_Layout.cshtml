@@ -2,6 +2,38 @@
     var currentController = (string?)ViewContext.RouteData.Values["controller"] ?? "";
     // true når vi er på Account-sider (Login/Registrer) → da vil vi skjule menyen
     var hideMenu = string.Equals(currentController, "Account", StringComparison.OrdinalIgnoreCase);
+
+    // Enkel visning av innlogget bruker (bruker e-post som base)
+    string? userEmail = User?.Identity?.IsAuthenticated == true ? User.Identity!.Name : null;
+    string? userNameShort = null;
+    string? userInitials = null;
+
+    if (!string.IsNullOrWhiteSpace(userEmail))
+    {
+        // vis bare delen før @ som "navn"
+        var atIndex = userEmail.IndexOf('@');
+        userNameShort = atIndex > 0 ? userEmail[..atIndex] : userEmail;
+
+        // Gjør første bokstav i navnet stor (real -> Real)
+        if (!string.IsNullOrWhiteSpace(userNameShort))
+        {
+            userNameShort = char.ToUpper(userNameShort[0]) +
+                            (userNameShort.Length > 1 ? userNameShort[1..] : string.Empty);
+        }
+
+        // lag 2 initialer (første og evt. første etter punktum/underscore)
+        var parts = userNameShort.Split(new[] { '.', '_', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 1)
+        {
+            userInitials = parts[0].Length >= 2
+                ? (parts[0][0].ToString() + parts[0][1].ToString()).ToUpperInvariant()
+                : parts[0][0].ToString().ToUpperInvariant();
+        }
+        else
+        {
+            userInitials = (parts[0][0].ToString() + parts[1][0].ToString()).ToUpperInvariant();
+        }
+    }
 }
 
 <!DOCTYPE html>
@@ -51,10 +83,22 @@
                             </li>
                         </ul>
 
-                        @* Logg ut-knapp til høyre – kun når innlogget *@
+                        @* Info om innlogget bruker + Logg ut-knapp til høyre *@
                         @if (User?.Identity?.IsAuthenticated == true)
                         {
-                            <div class="ms-auto d-flex align-items-center">
+                            <div class="ms-auto d-flex align-items-center gap-3">
+                                <div class="user-info d-flex align-items-center">
+                                    @if (!string.IsNullOrWhiteSpace(userInitials))
+                                    {
+                                        <div class="user-avatar me-2">
+                                            @userInitials
+                                        </div>
+                                    }
+                                    <div class="user-name text-truncate">
+                                        @userNameShort
+                                    </div>
+                                </div>
+
                                 <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
                                     @Html.AntiForgeryToken()
                                     <button type="submit" class="btn btn-outline-danger btn-sm logout-btn">
