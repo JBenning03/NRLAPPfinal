@@ -93,7 +93,7 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseSession();
 
-// ⚠️ Viktig rekkefølge
+// Viktig rekkefølge
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -155,9 +155,10 @@ using (var scope = app.Services.CreateScope())
     const string adminEmail = "admin@nrl.local";
     const string adminPass = "Admin!123!";
     const string adminRole = "Admin";
+    const string approverRole = "Approver";
 
-    if (!await roleManager.RoleExistsAsync(adminRole))
-        await roleManager.CreateAsync(new IdentityRole(adminRole));
+    if (!await roleManager.RoleExistsAsync(approverRole))
+        await roleManager.CreateAsync(new IdentityRole(approverRole));
 
     if (!userManager.Users.Any())
     {
@@ -170,7 +171,10 @@ using (var scope = app.Services.CreateScope())
 
         var result = await userManager.CreateAsync(admin, adminPass);
         if (result.Succeeded)
+        {
             await userManager.AddToRoleAsync(admin, adminRole);
+            await userManager.AddToRoleAsync(admin, approverRole);
+        }
         else
             logger.LogError("Klarte ikke å opprette admin: {Errors}",
                 string.Join(", ", result.Errors.Select(e => $"{e.Code}:{e.Description}")));

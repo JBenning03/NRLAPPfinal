@@ -9,5 +9,12 @@
         public string GeoJson { get; set; } = "{}";
         public bool IsDraft { get; set; }
         public DateTime CreatedUtc { get; set; }
+
+
+        // TIL REVIEW
+        public ObstacleStatus? ReviewStatus { get; set; }
+        public string? ReviewComment { get; set; }
+        public string? CreatedByUserName { get; set; }
+        public string? AssignedToUserName { get; set; }
     }
 }

@@ -1,19 +1,41 @@
-﻿@model NRLApp.Models.ObstacleDetailsVm
+﻿@using NRLApp.Models
+@model NRLApp.Models.ObstacleDetailsVm
 
 @{
     ViewData["Title"] = "Hinderdetaljer";
     var title = string.IsNullOrWhiteSpace(Model.ObstacleName)
         ? $"Hinder #{Model.Id}"
         : Model.ObstacleName;
+
+    var badgeClass = Model.IsDraft ? "bg-secondary" : "bg-warning text-dark";
+    var badgeText = Model.IsDraft ? "Utkast" : "Avventer";
+
+    if (!Model.IsDraft)
+    {
+        switch (Model.ReviewStatus)
+        {
+            case ObstacleStatus.Approved:
+                badgeClass = "bg-success";
+                badgeText = "Godkjent";
+                break;
+            case ObstacleStatus.Rejected:
+                badgeClass = "bg-danger";
+                badgeText = "Avvist";
+                break;
+        }
+    }
 }
 
 <h2>@title</h2>
 
 <div class="mb-3">
-    <span class="badge @(Model.IsDraft ? "bg-secondary" : "bg-success")">
-        @(Model.IsDraft ? "Utkast" : "Innsendt")
-    </span>
+    <span class="badge @badgeClass">@badgeText</span>
 </div>
+
+@if (TempData["StatusMessage"] is string statusMessage)
+{
+    <div class="alert alert-success">@statusMessage</div>
+}
 
 <div class="row">
     <div class="col-md-4">
@@ -38,6 +60,18 @@
             <dd class="col-sm-7">
                 @(string.IsNullOrWhiteSpace(Model.Description) ? "-" : Model.Description)
             </dd>
+
+            <dt class="col-sm-5">Saksstatus</dt>
+            <dd class="col-sm-7">@badgeText</dd>
+
+            <dt class="col-sm-5">Innmeldt av</dt>
+            <dd class="col-sm-7">@(string.IsNullOrWhiteSpace(Model.CreatedByUserName) ? "-" : Model.CreatedByUserName)</dd>
+
+            <dt class="col-sm-5">Behandlet av</dt>
+            <dd class="col-sm-7">@(string.IsNullOrWhiteSpace(Model.AssignedToUserName) ? "-" : Model.AssignedToUserName)</dd>
+
+            <dt class="col-sm-5">Saks-kommentar</dt>
+            <dd class="col-sm-7">@(string.IsNullOrWhiteSpace(Model.ReviewComment) ? "-" : Model.ReviewComment)</dd>
         </dl>
 
         <a asp-controller="Obstacle"
@@ -45,6 +79,39 @@
            class="btn btn-outline-secondary">
             Tilbake til liste
         </a>
+
+        <!-- GODKJENN / AVVIS – KUN FOR ADMIN + APPROVER -->
+        @if (!Model.IsDraft && (User.IsInRole("Admin") || User.IsInRole("Approver")))
+        {
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">Godkjenn eller avvis</h5>
+                    <p class="card-text">
+                        Oppdater status og legg ved en kommentar til den som meldte inn hinderet.
+                    </p>
+
+                    <form asp-controller="Obstacle" asp-action="Approve" method="post" id="review-form">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Id" />
+
+                        <div class="mb-3">
+                            <label class="form-label" for="reviewComment">Kommentar</label>
+                            <textarea class="form-control" id="reviewComment" name="reviewComment" rows="3">@Model.ReviewComment</textarea>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success">Godkjenn</button>
+
+                            <button type="submit"
+                                    class="btn btn-danger"
+                                    formaction="@Url.Action("Reject", "Obstacle")">
+                                Avvis
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        }
     </div>
 
     <div class="col-md-8">
@@ -65,7 +132,7 @@
 
         <script>
             // GeoJSON som ble lagret i databasen
-            const geo = @Html.Raw(string.IsNullOrWhiteSpace(Model.GeoJson) ? "{}" : Model.GeoJson);
+            const geo = JSON.parse(`@Html.Raw(string.IsNullOrWhiteSpace(Model.GeoJson) ? "{}" : Model.GeoJson)`);
 
             const map = L.map('map');
 
@@ -82,7 +149,6 @@
                 if (bounds.isValid()) {
                     map.fitBounds(bounds, { padding: [20, 20] });
                 } else {
-                    // Fallback – zoom til Norge-ish
                     map.setView([64.5, 11.0], 4);
                 }
             } catch (e) {

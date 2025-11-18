@@ -1,4 +1,6 @@
+@using NRLApp.Models
 @model IEnumerable<NRLApp.Models.ObstacleListItem>
+
 @{
     ViewData["Title"] = "Registrerte hindere";
 }
@@ -13,6 +15,8 @@
             <th>Høyde (m)</th>
             <th>Status</th>
             <th>Registrert</th>
+            <th>Innmeldt av</th>
+            <th>Behandlet av</th>
             <th>Vis</th>
         </tr>
     </thead>
@@ -24,18 +28,40 @@
                 <td>@(string.IsNullOrWhiteSpace(x.ObstacleName) ? "(uten navn)" : x.ObstacleName)</td>
                 <td>@(x.HeightMeters?.ToString() ?? "-")</td>
                 <td>
-                    @if (x.IsDraft)
-                    {
-                        <span class="badge bg-secondary">Utkast</span>
+                    @{
+                        var badgeClass = "bg-secondary";
+                        var badgeText = "Utkast";
+
+                        if (!x.IsDraft)
+                        {
+                            badgeClass = "bg-warning text-dark";
+                            badgeText = "Avventer";
+
+                            if (x.ReviewStatus == ObstacleStatus.Approved)
+                            {
+                                badgeClass = "bg-success";
+                                badgeText = "Godkjent";
+                            }
+                            else if (x.ReviewStatus == ObstacleStatus.Rejected)
+                            {
+                                badgeClass = "bg-danger";
+                                badgeText = "Avvist";
+                            }
+                        }
                     }
-                    else
+
+                    <span class="badge @badgeClass">@badgeText</span>
+
+                    @if (!string.IsNullOrWhiteSpace(x.ReviewComment))
                     {
-                        <span class="badge bg-success">Innsendt</span>
+                        <span class="badge bg-success ms-1">Innsendt</span>
+                        <div class="small text-muted mt-1">@x.ReviewComment</div>
                     }
                 </td>
                 <td>@x.CreatedUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                <td>@(string.IsNullOrWhiteSpace(x.CreatedByUserName) ? "-" : x.CreatedByUserName)</td>
+                <td>@(string.IsNullOrWhiteSpace(x.AssignedToUserName) ? "-" : x.AssignedToUserName)</td>
 
-                <!-- 🔹 Her er "Vis"-kolonnen -->
                 <td>
                     <a asp-controller="Obstacle"
                        asp-action="Vis"
