@@ -54,12 +54,12 @@ Bootstrap brukes for enkel og responsiv layout sammen med KI (ChatGPT)
  ###
  Denne delen definerer tilkoblingen til MariaDB-databasen.
 
- **Server** Navn til database-serveren, som i dette tilfellet er satt til "mariadb". 
- **Port** Standarden for MariaDB er 3306.
- **Database** Navnet på databasen som applikasjonen skal bruke, satt til "nrlappdb"
- **User ID** Brukernavnet for å koble til databasen, satt til "nrlappuser".
- **Password** Passordet for brukeren, satt til "nrlapp321".
- **SslMode** Angir om SSL brukes, satt til "None" fordi den ikke brukes.
+ **Server** Navn til database-serveren, som i dette tilfellet er satt til "127.0.0.1". 
+ **Port** Porten vi bruker for er 3307.
+ **Database** Navnet på databasen som applikasjonen skal bruke, satt til "nrl"
+ **User ID** Brukernavnet for å koble til databasen, satt til "nrl_user".
+ **Password** Passordet for brukeren, satt til "nrl_pass".
+ **SslMode** Satt til "None" fordi den ikke brukes.
 
  ### Logging
  Definerer hvor detaljerte loggene skal være under kjøring av applikasjonen.
@@ -80,9 +80,9 @@ Bootstrap brukes for enkel og responsiv layout sammen med KI (ChatGPT)
  Denne seksjonen definerer hvordan applikasjonen kobler til databasen under lokal utvikling.
 
  **Server** Satt til "localhost" for lokal utvikling.
- **Port** Porten databasen bruker, satt til 3307 for å unngå konflikt med standardporten.
+ **Port** Porten databasen bruker, satt til 3307, en alternativ MySQL-port for å unngå konflikt med standardporten 3306
  **Database** Navnet på databasen.
  **User ID** Brukernavnet for å koble til databasen, satt til root.
- **Password** Passordet for root-brukeren, satt til "nrlapp321".
+ **Password** Passordet for root-brukeren, satt til "nrl_pass".
  **SslMode** Angir at SSL ikke brukes, satt til "None".
 
