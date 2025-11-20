@@ -7,10 +7,7 @@ using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using MySqlConnector;
 using NRLApp.Models;
-<<<<<<< Updated upstream
-=======
 using NRLApp.Models.Obstacles;
->>>>>>> Stashed changes
 
 namespace NRLApp.Controllers
 {
@@ -55,14 +52,10 @@ namespace NRLApp.Controllers
                 return RedirectToAction(nameof(Area));
             }
 
-<<<<<<< Updated upstream
-            SaveDrawState(new DrawState { GeoJson = geoJson });
-=======
             // Lagre valgt geometri i TempData
             SaveDrawState(new DrawState { GeoJson = geoJson });
 
             // Gå videre til metadata-skjema
->>>>>>> Stashed changes
             return RedirectToAction(nameof(Meta));
         }
 
@@ -75,19 +68,12 @@ namespace NRLApp.Controllers
         {
             var s = GetDrawState();
 
-<<<<<<< Updated upstream
-            if (string.IsNullOrWhiteSpace(s.GeoJson))
-                return RedirectToAction(nameof(Area));
-
-            TempData.Keep(nameof(DrawJson));
-=======
             // Bruker forsøker å gå direkte inn på Meta uten å tegne noe først
             if (string.IsNullOrWhiteSpace(s.GeoJson))
                 return RedirectToAction(nameof(Area));
 
             TempData.Keep(nameof(DrawJson)); // Bevar data videre
 
->>>>>>> Stashed changes
             return View(new ObstacleMetaVm());
         }
 
@@ -121,37 +107,17 @@ namespace NRLApp.Controllers
 
             const string sql = @"
 INSERT INTO obstacles (
-<<<<<<< Updated upstream
-    geojson,
-    obstacle_name,
-    height_m,
-    obstacle_description,
-    is_draft,
-    created_utc,
-    created_by_user_id
-)
-VALUES (
-    @GeoJson,
-    @Name,
-    @HeightM,
-    @Descr,
-    @IsDraft,
-    UTC_TIMESTAMP(),
-    @CreatedByUserId
-=======
     geojson, obstacle_name, height_m, obstacle_description,
     is_draft, created_utc, created_by_user_id
 )
 VALUES (
     @GeoJson, @Name, @HeightM, @Descr,
-    @IsDraft, UTC_TIMESTAMP(), @CreatedBy
->>>>>>> Stashed changes
+    @IsDraft, UTC_TIMESTAMP(), @CreatedByUserId
 );";
 
             using var con = CreateConnection();
             await con.ExecuteAsync(sql, new
             {
-<<<<<<< Updated upstream
                 GeoJson = geoJsonToSave,
                 Name = vm.ObstacleName,
                 HeightM = (int?)Math.Round(heightMeters, 0),
@@ -160,26 +126,9 @@ VALUES (
                 CreatedByUserId = userId
             });
 
+            // Slett TempData
             DrawJson = null;
-=======
-                // Lagrer hinder i databasen
-                await con.ExecuteAsync(sql, new
-                {
-                    GeoJson = geoJsonToSave,
-                    Name = vm.ObstacleName,
-                    HeightM = (int?)Math.Round(heightMeters, 0),
-                    Descr = vm.Description,
-                    IsDraft = isDraft ? 1 : 0,
-                    CreatedBy = User.FindFirstValue(ClaimTypes.NameIdentifier)
-                });
-            }
-            catch
-            {
-                // TODO: logging her
-            }
 
-            DrawJson = null; // Slett TempData
->>>>>>> Stashed changes
             return RedirectToAction(nameof(Thanks), new { draft = isDraft });
         }
 
@@ -309,18 +258,6 @@ ORDER BY o.id DESC;";
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             const string sql = @"
-<<<<<<< Updated upstream
-SELECT id,
-       geojson,
-       obstacle_name         AS ObstacleName,
-       height_m              AS HeightM,
-       obstacle_description  AS ObstacleDescription,
-       is_draft              AS IsDraft,
-       created_utc           AS CreatedUtc,
-       created_by_user_id
-FROM obstacles
-WHERE id = @id;";
-=======
 SELECT o.id,
        o.geojson              AS GeoJson,
        o.obstacle_name        AS ObstacleName,
@@ -336,7 +273,6 @@ FROM obstacles o
 LEFT JOIN AspNetUsers createdUser  ON createdUser.Id = o.created_by_user_id
 LEFT JOIN AspNetUsers assignedUser ON assignedUser.Id = o.assigned_to_user_id
 WHERE o.id = @id;";
->>>>>>> Stashed changes
 
             using var con = CreateConnection();
             var row = await con.QuerySingleOrDefaultAsync<ObstacleDetailsVm>(sql, new { id });
@@ -451,8 +387,6 @@ WHERE id = @id
 
             return RedirectToAction(nameof(List));
         }
-<<<<<<< Updated upstream
-=======
 
         // =========================================================
         // 8) GODKJENN / AVVIS (REVIEW)
@@ -498,6 +432,5 @@ WHERE id = @Id;";
 
             return RedirectToAction(nameof(Details), new { id });
         }
->>>>>>> Stashed changes
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NRLApp.Models
+namespace NRLApp.Models.Account
 {
     public class RegisterViewModel
     {
@@ -22,5 +22,3 @@ namespace NRLApp.Models
         public string ConfirmPassword { get; set; } = string.Empty;
     }
 }
-
-

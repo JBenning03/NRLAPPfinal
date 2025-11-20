@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NRLApp.Models
+namespace NRLApp.Models.Account
 {
     public class LoginViewModel
     {
@@ -18,4 +18,3 @@ namespace NRLApp.Models
         public bool RememberMe { get; set; }
     }
 }
-
