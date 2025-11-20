@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
@@ -140,28 +141,94 @@ VALUES (
         }
 
         // =========================================================
-        // 4) LISTE OVER HINDRE (kun egne)
+        // 4) LISTE OVER HINDRE + FILTRERING
         // =========================================================
 
         [HttpGet]
-        public async Task<IActionResult> List()
+        public async Task<IActionResult> List([FromQuery] ObstacleListFilter filter)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             using var con = CreateConnection();
+            var where = new List<string>();
+            var parameters = new DynamicParameters();
 
-            const string sql = @"
+            if (filter.Id.HasValue)
+            {
+                where.Add("id = @Id");
+                parameters.Add("Id", filter.Id.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(filter.ObstacleName))
+            {
+                where.Add("LOWER(obstacle_name) LIKE @ObstacleName");
+                parameters.Add("ObstacleName", $"%{filter.ObstacleName.Trim().ToLowerInvariant()}%");
+            }
+
+            if (filter.MinHeightMeters.HasValue)
+            {
+                where.Add("height_m >= @MinHeight");
+                parameters.Add("MinHeight", filter.MinHeightMeters.Value);
+            }
+
+            if (filter.MaxHeightMeters.HasValue)
+            {
+                where.Add("height_m <= @MaxHeight");
+                parameters.Add("MaxHeight", filter.MaxHeightMeters.Value);
+            }
+
+            if (filter.Status.HasValue)
+            {
+                where.Add("is_draft = @IsDraft");
+                parameters.Add("IsDraft", filter.Status.Value == ObstacleListStatusFilter.Draft ? 1 : 0);
+            }
+
+            var createdFromUtc = NormalizeToUtc(filter.CreatedFrom);
+            if (createdFromUtc.HasValue)
+            {
+                where.Add("created_utc >= @CreatedFrom");
+                parameters.Add("CreatedFrom", createdFromUtc.Value);
+            }
+
+            var createdToUtc = NormalizeToUtc(filter.CreatedTo);
+            if (createdToUtc.HasValue)
+            {
+                where.Add("created_utc <= @CreatedTo");
+                parameters.Add("CreatedTo", createdToUtc.Value);
+            }
+
+            var whereClause = where.Count == 0 ? string.Empty : $" WHERE {string.Join(" AND ", where)}";
+
+            var sql = $@"
 SELECT id,
        obstacle_name    AS ObstacleName,
        height_m         AS HeightMeters,
        is_draft         AS IsDraft,
        created_utc      AS CreatedUtc
-FROM obstacles
-WHERE created_by_user_id = @UserId
+FROM obstacles{whereClause}
 ORDER BY id DESC;";
 
-            var rows = await con.QueryAsync<ObstacleListItem>(sql, new { UserId = userId });
-            return View(rows);
+            var rows = await con.QueryAsync<ObstacleListItem>(sql, parameters);
+            return View(new ObstacleListVm
+            {
+                Filter = filter,
+                Items = rows
+            });
+        }
+
+        private static DateTime? NormalizeToUtc(DateTime? value)
+        {
+            if (value is null)
+                return null;
+
+            var dt = value.Value;
+            if (dt.Kind == DateTimeKind.Utc)
+                return dt;
+
+            if (dt.Kind == DateTimeKind.Unspecified)
+                return DateTime.SpecifyKind(dt, DateTimeKind.Local).ToUniversalTime();
+
+            return dt.ToUniversalTime();
         }
 
         // =========================================================
