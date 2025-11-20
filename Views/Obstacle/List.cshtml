@@ -7,9 +7,8 @@
 <div class="screen">
     <h2>REGISTRERTE HINDRE</h2>
 
-<<<<<<< HEAD
-    <div class="table-responsive">
-        <table class="table table-sm align-middle">
+    <div class="obstacle-table-wrapper">
+        <table class="table table-striped align-middle obstacle-table">
             <thead>
                 <tr>
                     <th>#</th>
@@ -25,63 +24,14 @@
             <tbody>
                 @if (Model != null && Model.Any())
                 {
-                    foreach (var item in Model)
-=======
-<div class="obstacle-table-wrapper">
-    <table class="table table-striped align-middle obstacle-table">
-    <thead>
-        <tr>
-            <th>#</th>
-            <th>Hinder</th>
-            <th>Høyde (m)</th>
-            <th>Status</th>
-            <th>Registrert</th>
-            <th>Innmeldt av</th>
-            <th>Behandlet av</th>
-            <th>Vis</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var x in Model)
-        {
-            <tr>
-                <td>@x.Id</td>
-                <td>@(string.IsNullOrWhiteSpace(x.ObstacleName) ? "(uten navn)" : x.ObstacleName)</td>
-                <td>@(x.HeightMeters?.ToString() ?? "-")</td>
-                <td>
-                    @{
-                        var badgeClass = "bg-secondary";
-                        var badgeText = "Utkast";
-
-                        if (!x.IsDraft)
-                        {
-                            badgeClass = "bg-warning text-dark";
-                            badgeText = "Avventer";
-
-                            if (x.ReviewStatus == ObstacleStatus.Approved)
-                            {
-                                badgeClass = "bg-success";
-                                badgeText = "Godkjent";
-                            }
-                            else if (x.ReviewStatus == ObstacleStatus.Rejected)
-                            {
-                                badgeClass = "bg-danger";
-                                badgeText = "Avvist";
-                            }
-                        }
-                    }
-
-                    <span class="badge @badgeClass">@badgeText</span>
-
-                    @if (!string.IsNullOrWhiteSpace(x.ReviewComment))
->>>>>>> origin/main
+                    foreach (var x in Model)
                     {
                         <tr>
-                            <td>@item.Id</td>
-                            <td>@item.ObstacleName</td>
-                            <td>@item.HeightMeters</td>
+                            <td>@x.Id</td>
+                            <td>@(string.IsNullOrWhiteSpace(x.ObstacleName) ? "(uten navn)" : x.ObstacleName)</td>
+                            <td>@(x.HeightMeters?.ToString() ?? "-")</td>
                             <td>
-                                @if (item.IsDraft)
+                                @if (x.IsDraft)
                                 {
                                     <span class="badge bg-secondary">Utkast</span>
                                 }
@@ -90,16 +40,15 @@
                                     <span class="badge bg-warning text-dark">Avventer</span>
                                 }
                             </td>
-                            <td>@item.CreatedUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>@x.CreatedUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
 
-<<<<<<< HEAD
-                            @* Disse to er ikke implementert i databasen ennå – vis “-” *@
+                            @* Ikke implementert ennå → vis “-” *@
                             <td>-</td>
                             <td>-</td>
 
                             <td>
                                 <a asp-action="Details"
-                                   asp-route-id="@item.Id"
+                                   asp-route-id="@x.Id"
                                    class="btn btn-primary btn-sm">
                                     Vis
                                 </a>
@@ -119,18 +68,3 @@
         </table>
     </div>
 </div>
-=======
-                <td>
-                    <a asp-controller="Obstacle"
-                       asp-action="Vis"
-                       asp-route-id="@x.Id"
-                       class="btn btn-sm btn-primary">
-                        Vis
-                    </a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-</div>
->>>>>>> origin/main

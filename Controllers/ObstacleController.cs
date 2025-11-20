@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 using System;
 using System.Threading.Tasks;
 using Dapper;
@@ -5,8 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using MySqlConnector;
 using NRLApp.Models;
 
+
+
 namespace NRLApp.Controllers
 {
+    [Authorize]
     public class ObstacleController : Controller
     {
         private readonly IConfiguration _config;

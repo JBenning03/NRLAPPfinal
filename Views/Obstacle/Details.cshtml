@@ -4,6 +4,90 @@
 <link rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
+<!-- Inline overrides for immediate effect: stor info-boks, flyttede/justerte knapper -->
+<style>
+    /* Venstre kolonne wrapper (behåll grid layout uden å påvirke resten) */
+    .details-info {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 1rem !important;
+    }
+
+    /* Større, tydelig info-boks som omkranser feltene */
+    .info-box {
+        border: 1px solid #e6e9ee;
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 22px;
+        min-height: 360px; /* høyde på den store boksen — juster om du vil større */
+        box-shadow: 0 2px 10px rgba(15,23,42,0.03);
+    }
+
+    /* Kompakt info-innhold inni boksen */
+    .details-grid {
+        margin: 0;
+    }
+
+    .details-row {
+        display: grid;
+        grid-template-columns: 110px minmax(0, 1fr);
+        column-gap: .8rem;
+        row-gap: .18rem;
+        margin-bottom: .18rem;
+    }
+
+    .details-label {
+        font-weight: 700;
+        color: #374151;
+        font-size: 1.00rem;
+    }
+
+    .details-value {
+        color: #111827;
+        font-size: 1.06rem;
+        line-height: 1.22;
+    }
+
+    /* Plassering av Endre / Slett: side-ved-side, liggende rett under info-boksen og sentrert */
+    .actions-under-box {
+        display: flex;
+        justify-content: center; /* sentrer horisontalt i venstre kolonne */
+        gap: 1rem;
+        margin-top: 1rem; /* liten avstand ned fra info-boksen */
+    }
+
+        /* Gjør knappene litt mer kompakte/proporsjonert */
+        .actions-under-box .btn {
+            padding: .6rem 1.1rem;
+            border-radius: 10px;
+            font-size: 1.04rem;
+        }
+
+    /* Tilbake-knappen: plassert nederst til venstre i venstre kolonne */
+    .details-back-row {
+        margin-top: 1.25rem;
+        align-self: flex-start;
+        margin-left: 4px; /* lille innrykk fra kanten */
+    }
+
+    /* Hvis du ønsker tilbake-knappen helt nederst i kolonnen (kan byttes ved å sette min-height på parent) */
+    /* .details-info { min-height: 520px; } */
+    /* .details-back-row { margin-top: auto; } */
+
+    @@media (max-width: 900px) {
+        /* Bruk normal flyt på mobil */
+        .info-box {
+            min-height: auto;
+            padding: 16px;
+        }
+
+        .actions-under-box {
+            justify-content: center;
+            margin-top: .8rem;
+        }
+    }
+</style>
+
 <div class="screen details-shell">
     <div class="details-header-row">
         <h1 class="details-title">@Model.ObstacleName</h1>
@@ -21,43 +105,46 @@
     <div class="details-content-row">
         <!-- VENSTRE: fakta + knapper -->
         <div class="details-info">
-            <dl class="details-grid">
-                <div class="details-row">
-                    <dt class="details-label">ID</dt>
-                    <dd class="details-value">@Model.Id</dd>
-                </div>
+            <!-- STOR INFO-BOKS -->
+            <div class="info-box">
+                <dl class="details-grid">
+                    <div class="details-row">
+                        <dt class="details-label">ID</dt>
+                        <dd class="details-value">@Model.Id</dd>
+                    </div>
 
-                <div class="details-row">
-                    <dt class="details-label">Høyde (m)</dt>
-                    <dd class="details-value">@Model.HeightM</dd>
-                </div>
+                    <div class="details-row">
+                        <dt class="details-label">Høyde (m)</dt>
+                        <dd class="details-value">@Model.HeightM</dd>
+                    </div>
 
-                <div class="details-row">
-                    <dt class="details-label">Registrert</dt>
-                    <dd class="details-value">
-                        @(Model.CreatedUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm", CultureInfo.CurrentCulture))
-                    </dd>
-                </div>
+                    <div class="details-row">
+                        <dt class="details-label">Registrert</dt>
+                        <dd class="details-value">
+                            @(Model.CreatedUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm", CultureInfo.CurrentCulture))
+                        </dd>
+                    </div>
 
-                <div class="details-row">
-                    <dt class="details-label">Beskrivelse</dt>
-                    <dd class="details-value">
-                        @if (string.IsNullOrWhiteSpace(Model.ObstacleDescription))
-                        {
-                            @:-
-                        }
-                        else
-                        {
-                            @Model.ObstacleDescription
-                        }
-                    </dd>
-                </div>
-            </dl>
-
-            <div class="details-actions-row">
+                    <div class="details-row">
+                        <dt class="details-label">Beskrivelse</dt>
+                        <dd class="details-value">
+                            @if (string.IsNullOrWhiteSpace(Model.ObstacleDescription))
+                            {
+                                @:-
+                            }
+                            else
+                            {
+                                @Model.ObstacleDescription
+                            }
+                        </dd>
+                    </div>
+                </dl>
+            </div> <!-- /.info-box -->
+            <!-- ENDRE / SLETT: side-ved-side, plassert rett under info-boksen -->
+            <div class="actions-under-box">
                 <a asp-action="Edit"
                    asp-route-id="@Model.Id"
-                   class="btn btn-primary btn-lg me-3">
+                   class="btn btn-primary">
                     Endre
                 </a>
 
@@ -67,12 +154,13 @@
                       class="d-inline">
                     @Html.AntiForgeryToken()
                     <button type="submit"
-                            class="btn btn-outline-danger btn-lg">
+                            class="btn btn-outline-danger">
                         Slett
                     </button>
                 </form>
             </div>
 
+            <!-- TILBAKE-TIL-LISTE: plassert under knappene, venstrejustert (i hjørne) -->
             <div class="details-back-row">
                 <a asp-action="List" class="btn btn-outline-secondary btn-lg">
                     Tilbake til liste
@@ -94,13 +182,13 @@
         (function () {
             // GeoJSON fra databasen (FeatureCollection fra Leaflet Draw)
             const geoJson = @Html.Raw(
-                                                    string.IsNullOrWhiteSpace(Model.GeoJson)
-                                                                    ? "{\"type\":\"FeatureCollection\",\"features\":[]}"
-                                                                    : Model.GeoJson
-                                    );
+                                                                                                    string.IsNullOrWhiteSpace(Model.GeoJson)
+                                                                                                                                    ? "{\"type\":\"FeatureCollection\",\"features\":[]}"
+                                                                                                                                    : Model.GeoJson
+                                                                    );
 
-    // fallback sentrum (Kristiansand) hvis noe går galt
-    const defaultCenter = [58.1467, 7.9956];
+        // fallback sentrum (Kristiansand) hvis noe går galt
+        const defaultCenter = [58.1467, 7.9956];
 
             const map = L.map('details-map').setView(defaultCenter, 13);
 

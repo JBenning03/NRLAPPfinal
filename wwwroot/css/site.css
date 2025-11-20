@@ -692,3 +692,202 @@ body {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+/* ===== DETALJVISNING HINDRE ===== */
+
+.details-shell {
+    max-width: 1200px;
+    margin: 2rem auto 2.5rem;
+    padding: 2rem 2.5rem;
+    background: var(--surface);
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.06);
+}
+
+.details-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.details-title {
+    font-size: 2.3rem;
+    font-weight: 800;
+    margin: 0;
+}
+
+.details-status {
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+    font-size: .9rem;
+    font-weight: 700;
+}
+
+.badge-pending {
+    background: #facc15;
+    color: #713f12;
+}
+
+.badge-draft {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.details-content-row {
+    display: grid;
+    grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+    gap: 2.5rem;
+    align-items: flex-start;
+}
+
+/* ===== DETALJVISNING HINDRE ===== */
+
+.details-shell {
+    max-width: 1200px;
+    margin: 2rem auto 2.5rem;
+    padding: 2rem 2.5rem;
+    background: var(--surface);
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.06);
+}
+
+.details-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.details-title {
+    font-size: 2.3rem;
+    font-weight: 800;
+    margin: 0;
+}
+
+.details-status {
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+    font-size: .9rem;
+    font-weight: 700;
+}
+
+.badge-pending {
+    background: #facc15;
+    color: #713f12;
+}
+
+.badge-draft {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.details-content-row {
+    display: grid;
+    grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+    gap: 2.5rem;
+    align-items: flex-start;
+}
+
+/* --- VENSTRE KOLONNE: kompakt info + knappplassering --- */
+.details-info {
+    display: flex;
+    flex-direction: column;
+    /* gjør venstre kolonne omtrent like høy som kart-boksen så mt-auto virker */
+    min-height: 420px; /* juster om du vil knappene lenger ned/opp */
+    padding-top: 6px; /* liten forskyvning nedover */
+}
+
+/* litt tettere mellom rader og noe større tekst */
+.details-grid {
+    margin: 0 0 1rem 0;
+}
+
+.details-row {
+    display: grid;
+    grid-template-columns: 110px minmax(0, 1fr); /* litt mindre label-bredde */
+    column-gap: .9rem; /* mindre horisontalt mellomrom */
+    row-gap: .25rem; /* tettere vertikal spacing */
+    margin-bottom: .35rem; /* kompakt */
+}
+
+.details-label {
+    font-weight: 700;
+    color: #4b5563;
+    font-size: .98rem; /* litt større */
+}
+
+.details-value {
+    color: #111827;
+    font-size: 1.03rem; /* litt større og tettere */
+    line-height: 1.25;
+}
+
+/* Sentrer Endre / Slett og flytt dem litt lenger ned (juster --actions-offset for finjustering) */
+:root {
+    --actions-offset: 2.2rem; /* øk for mer nedover, mink for mindre */
+}
+
+.details-actions-row {
+    margin-top: var(--actions-offset);
+    display: flex;
+    gap: .75rem;
+    justify-content: center; /* sentrer horisontalt */
+    align-items: center;
+}
+
+/* Tilbake-knappen skal ligge nederst til venstre i venstre kolonne */
+.details-back-row {
+    margin-top: auto; /* press ned til bunn */
+    align-self: flex-start; /* venstre-juster */
+}
+
+/* map-deler beholder samme utseende */
+.details-map-wrap {
+    width: 100%;
+}
+
+.details-map-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: .5rem;
+}
+
+.details-map-box {
+    width: 100%;
+    height: 420px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+}
+
+/* Mobil */
+@media (max-width: 900px) {
+    .details-content-row {
+        grid-template-columns: 1fr;
+    }
+
+    .details-map-box {
+        height: 320px;
+    }
+
+    .details-title {
+        font-size: 1.9rem;
+    }
+
+    /* på mobil vil vi ikke ha så stor min-height */
+    .details-info {
+        min-height: auto;
+        padding-top: 0;
+    }
+
+    /* knapp-offset mindre på mobil */
+    :root {
+        --actions-offset: 1rem;
+    }
+}
+
+.user-info {
+    margin-right: 1.5rem;
+}
