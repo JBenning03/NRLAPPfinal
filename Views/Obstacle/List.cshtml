@@ -1,4 +1,5 @@
-@model NRLApp.Models.ObstacleListVm
+@using NRLApp.Models.Obstacles
+@model ObstacleListVm
 
 @{
     ViewData["Title"] = "Registrerte hindre";
@@ -34,8 +35,8 @@
                     <label class="form-label" for="filter-status">Status</label>
                     <select class="form-select" id="filter-status" name="Status">
                         <option value="" selected="@(Model.Filter.Status is null)">Alle</option>
-                        <option value="Draft" selected="@(Model.Filter.Status == NRLApp.Models.ObstacleListStatusFilter.Draft)">Utkast</option>
-                        <option value="Pending" selected="@(Model.Filter.Status == NRLApp.Models.ObstacleListStatusFilter.Pending)">Avventer</option>
+                        <option value="Draft" selected="@(Model.Filter.Status == ObstacleListStatusFilter.Draft)">Utkast</option>
+                        <option value="Pending" selected="@(Model.Filter.Status == ObstacleListStatusFilter.Pending)">Avventer</option>
                     </select>
                 </div>
 
@@ -59,7 +60,6 @@
             </form>
         </div>
     </div>
-
 
     <div class="obstacle-table-wrapper">
         <table class="table table-striped align-middle obstacle-table">
@@ -85,20 +85,36 @@
                             <td>@(string.IsNullOrWhiteSpace(x.ObstacleName) ? "(uten navn)" : x.ObstacleName)</td>
                             <td>@(x.HeightMeters?.ToString() ?? "-")</td>
                             <td>
-                                @if (x.IsDraft)
-                                {
-                                    <span class="badge bg-secondary">Utkast</span>
+                                @{
+                                    var badgeClass = "badge bg-warning text-dark";
+                                    var badgeText = "Avventer";
+
+                                    if (x.IsDraft)
+                                    {
+                                        badgeClass = "badge bg-secondary";
+                                        badgeText = "Utkast";
+                                    }
+                                    else
+                                    {
+                                        switch (x.ReviewStatus)
+                                        {
+                                            case ObstacleStatus.Approved:
+                                                badgeClass = "badge bg-success";
+                                                badgeText = "Godkjent";
+                                                break;
+                                            case ObstacleStatus.Rejected:
+                                                badgeClass = "badge bg-danger";
+                                                badgeText = "Avvist";
+                                                break;
+                                        }
+                                    }
                                 }
-                                else
-                                {
-                                    <span class="badge bg-warning text-dark">Avventer</span>
-                                }
+                                <span class="@badgeClass">@badgeText</span>
                             </td>
                             <td>@x.CreatedUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
 
-                            @* Ikke implementert ennå → vis “-” *@
-                            <td>-</td>
-                            <td>-</td>
+                            <td>@(string.IsNullOrWhiteSpace(x.CreatedByUserName) ? "-" : x.CreatedByUserName)</td>
+                            <td>@(string.IsNullOrWhiteSpace(x.AssignedToUserName) ? "-" : x.AssignedToUserName)</td>
 
                             <td>
                                 <a asp-action="Details"

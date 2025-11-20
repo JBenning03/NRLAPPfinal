@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NRLApp.Models
+namespace NRLApp.Models.Obstacles
 {
     // Brukes når vi redigerer et eksisterende hinder
     // Arver fra ObstacleMetaVm for å gjenbruke felter og validering

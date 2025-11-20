@@ -1,6 +1,6 @@
 using System;
 
-namespace NRLApp.Models
+namespace NRLApp.Models.Obstacles
 {
     public sealed class ObstacleData
     {

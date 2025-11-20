@@ -1,4 +1,4 @@
-﻿namespace NRLApp.Models
+﻿namespace NRLApp.Models.Obstacles
 {
     public enum ObstacleStatus
     {

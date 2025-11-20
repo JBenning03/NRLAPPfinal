@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NRLApp.Models
+namespace NRLApp.Models.Obstacles
 {
     // Holder GeoJSON mellom trinnene (brukes i TempData i controlleren)
     public class DrawState
