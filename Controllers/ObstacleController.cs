@@ -1,14 +1,12 @@
-using System.Security.Claims;
-using System.Text.Json;
+using System;
+using System.Threading.Tasks;
 using Dapper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MySqlConnector;
 using NRLApp.Models;
 
 namespace NRLApp.Controllers
 {
-    // INGEN [Authorize] PÅ KLASSE-NIVÅ – alle får se som default
     public class ObstacleController : Controller
     {
         private readonly IConfiguration _config;
@@ -23,17 +21,20 @@ namespace NRLApp.Controllers
         private DrawState GetDrawState()
             => string.IsNullOrWhiteSpace(DrawJson)
                 ? new DrawState()
-                : (JsonSerializer.Deserialize<DrawState>(DrawJson!) ?? new DrawState());
+                : (System.Text.Json.JsonSerializer.Deserialize<DrawState>(DrawJson!) ?? new DrawState());
 
         private void SaveDrawState(DrawState s)
-            => DrawJson = JsonSerializer.Serialize(s);
+            => DrawJson = System.Text.Json.JsonSerializer.Serialize(s);
 
-        // ===== STEP 1: Tegn markør/linje/område =====
+        // =========================================================
+        // 1) TEGN OMRÅDE (AREA)
+        // =========================================================
+
         [HttpGet]
         public IActionResult Area() => View();
 
-        // Tar imot GeoJSON fra skjema
-        [HttpPost, ValidateAntiForgeryToken]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Area(string geoJson)
         {
             if (string.IsNullOrWhiteSpace(geoJson))
@@ -42,26 +43,34 @@ namespace NRLApp.Controllers
                 return RedirectToAction(nameof(Area));
             }
 
+            // Lagrer GeoJSON i TempData mellom steg
             SaveDrawState(new DrawState { GeoJson = geoJson });
 
+            // Gå videre til metadata
             return RedirectToAction(nameof(Meta));
         }
 
-        // ===== STEP 2: Skriv inn metadata =====
+        // =========================================================
+        // 2) METADATA (META)
+        // =========================================================
+
         [HttpGet]
         public IActionResult Meta()
         {
             var s = GetDrawState();
 
+            // Hvis noen går direkte til /Obstacle/Meta uten å ha vært innom Area
             if (string.IsNullOrWhiteSpace(s.GeoJson))
                 return RedirectToAction(nameof(Area));
 
+            // Behold DrawJson videre til POST
             TempData.Keep(nameof(DrawJson));
 
             return View(new ObstacleMetaVm());
         }
 
-        [HttpPost, ValidateAntiForgeryToken]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Meta(ObstacleMetaVm vm, string? action)
         {
             var s = GetDrawState();
@@ -75,19 +84,20 @@ namespace NRLApp.Controllers
             if (!ModelState.IsValid)
                 return View(vm);
 
+            // Konverter høyde til meter
             double heightMeters = vm.HeightValue!.Value;
-
             if (string.Equals(vm.HeightUnit, "ft", StringComparison.OrdinalIgnoreCase))
+            {
                 heightMeters = Math.Round(heightMeters * 0.3048, 0);
+            }
 
             bool isDraft = string.Equals(action, "draft", StringComparison.OrdinalIgnoreCase) || vm.SaveAsDraft;
 
             const string sql = @"
-INSERT INTO obstacles (geojson, obstacle_name, height_m, obstacle_description, is_draft, created_utc, created_by_user_id, review_status)
-VALUES (@GeoJson, @Name, @HeightM, @Descr, @IsDraft, UTC_TIMESTAMP(), @CreatedBy, @ReviewStatus);";
+INSERT INTO obstacles (geojson, obstacle_name, height_m, obstacle_description, is_draft, created_utc)
+VALUES (@GeoJson, @Name, @HeightM, @Descr, @IsDraft, UTC_TIMESTAMP());";
 
             using var con = CreateConnection();
-
             try
             {
                 await con.ExecuteAsync(sql, new
@@ -96,23 +106,23 @@ VALUES (@GeoJson, @Name, @HeightM, @Descr, @IsDraft, UTC_TIMESTAMP(), @CreatedBy
                     Name = vm.ObstacleName,
                     HeightM = (int?)Math.Round(heightMeters, 0),
                     Descr = vm.Description,
-                    IsDraft = isDraft ? 1 : 0,
-                    CreatedBy = User?.Identity?.IsAuthenticated == true
-                        ? User.FindFirstValue(ClaimTypes.NameIdentifier)
-                        : null,
-                    ReviewStatus = isDraft ? null : ObstacleStatus.Pending.ToString()
+                    IsDraft = isDraft ? 1 : 0
                 });
             }
             catch
             {
-                // logging hvis ønskelig
+                // Evt. logging
             }
 
+            // Tøm state og send til takk
             DrawJson = null;
             return RedirectToAction(nameof(Thanks), new { draft = isDraft });
         }
 
-        // ===== Takk =====
+        // =========================================================
+        // 3) TAKK-SIDE
+        // =========================================================
+
         [HttpGet]
         public IActionResult Thanks(bool draft = false)
         {
@@ -120,107 +130,166 @@ VALUES (@GeoJson, @Name, @HeightM, @Descr, @IsDraft, UTC_TIMESTAMP(), @CreatedBy
             return View();
         }
 
-        // ===== Liste – ÅPEN FOR ALLE =====
+        // =========================================================
+        // 4) LISTE OVER HINDRE
+        // =========================================================
+
         [HttpGet]
         public async Task<IActionResult> List()
         {
             using var con = CreateConnection();
             const string sql = @"
-SELECT o.id,
-       o.obstacle_name        AS ObstacleName,
-       o.height_m             AS HeightMeters,
-       o.is_draft             AS IsDraft,
-       o.created_utc          AS CreatedUtc,
-       o.review_status        AS ReviewStatus,
-       o.review_comment       AS ReviewComment,
-       createdBy.UserName     AS CreatedByUserName,
-       assignedTo.UserName    AS AssignedToUserName
-FROM obstacles o
-LEFT JOIN AspNetUsers createdBy ON createdBy.Id = o.created_by_user_id
-LEFT JOIN AspNetUsers assignedTo ON assignedTo.Id = o.assigned_to_user_id
-ORDER BY o.id DESC;";
-
+SELECT id,
+       obstacle_name    AS ObstacleName,
+       height_m         AS HeightMeters,
+       is_draft         AS IsDraft,
+       created_utc      AS CreatedUtc
+FROM obstacles
+ORDER BY id DESC;";
             var rows = await con.QueryAsync<ObstacleListItem>(sql);
             return View(rows);
         }
 
-        // ===== Vis – OGSÅ ÅPEN FOR ALLE =====
+        // =========================================================
+        // 5) DETALJVISNING
+        // =========================================================
+
         [HttpGet]
-        public async Task<IActionResult> Vis(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            using var con = CreateConnection();
-
             const string sql = @"
-SELECT o.id,
-       o.obstacle_name        AS ObstacleName,
-       o.height_m             AS HeightMeters,
-       o.obstacle_description AS Description,
-       o.geojson              AS GeoJson,
-       o.is_draft             AS IsDraft,
-       o.created_utc          AS CreatedUtc,
-       o.review_status        AS ReviewStatus,
-       o.review_comment       AS ReviewComment,
-       createdBy.UserName     AS CreatedByUserName,
-       assignedTo.UserName    AS AssignedToUserName
-FROM obstacles o
-LEFT JOIN AspNetUsers createdBy ON createdBy.Id = o.created_by_user_id
-LEFT JOIN AspNetUsers assignedTo ON assignedTo.Id = o.assigned_to_user_id
-WHERE o.id = @Id;";
+SELECT id,
+       geojson,
+       obstacle_name         AS ObstacleName,
+       height_m              AS HeightM,
+       obstacle_description  AS ObstacleDescription,
+       is_draft              AS IsDraft,
+       created_utc           AS CreatedUtc
+FROM obstacles
+WHERE id = @id;";
 
-            var obstacle = await con.QuerySingleOrDefaultAsync<ObstacleDetailsVm>(sql, new { Id = id });
+            using var con = CreateConnection();
+            var row = await con.QuerySingleOrDefaultAsync<ObstacleData>(sql, new { id });
 
-            if (obstacle == null)
+            if (row == null)
                 return NotFound();
 
-            return View(obstacle);
+            return View(row);
         }
 
-        // ===== Godkjenn / Avvis – KUN ADMIN/APPROVER =====
-        [HttpPost]
-        [Authorize(Roles = "Admin,Approver")]
-        [ValidateAntiForgeryToken]
-        public Task<IActionResult> Approve(int id, string? reviewComment)
-            => UpdateReviewStatus(id, ObstacleStatus.Approved, reviewComment);
+        // =========================================================
+        // 6) ENDRE HINDER
+        // =========================================================
 
-        [HttpPost]
-        [Authorize(Roles = "Admin,Approver")]
-        [ValidateAntiForgeryToken]
-        public Task<IActionResult> Reject(int id, string? reviewComment)
-            => UpdateReviewStatus(id, ObstacleStatus.Rejected, reviewComment);
-
-        [Authorize(Roles = "Admin,Approver")]
-        private async Task<IActionResult> UpdateReviewStatus(int id, ObstacleStatus status, string? reviewComment)
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
         {
-            var userId = User?.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId))
-                return Challenge();
+            const string sql = @"
+SELECT id,
+       geojson,
+       obstacle_name         AS ObstacleName,
+       height_m              AS HeightM,
+       obstacle_description  AS ObstacleDescription,
+       is_draft              AS IsDraft,
+       created_utc           AS CreatedUtc
+FROM obstacles
+WHERE id = @id;";
 
             using var con = CreateConnection();
+            var row = await con.QuerySingleOrDefaultAsync<ObstacleData>(sql, new { id });
+
+            if (row == null)
+                return NotFound();
+
+            var vm = new ObstacleEditVm
+            {
+                Id = row.Id,
+                ObstacleName = row.ObstacleName,
+                HeightValue = row.HeightM,
+                HeightUnit = "m",
+                Description = row.ObstacleDescription,
+                SaveAsDraft = row.IsDraft
+            };
+
+            return View(vm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(ObstacleEditVm vm)
+        {
+            if (string.IsNullOrWhiteSpace(vm.ObstacleName))
+                ModelState.AddModelError(nameof(vm.ObstacleName), "Skriv hva det er.");
+            if (vm.HeightValue is null || vm.HeightValue < 0)
+                ModelState.AddModelError(nameof(vm.HeightValue), "Oppgi høyde.");
+
+            if (!ModelState.IsValid)
+                return View(vm);
+
+            double heightMeters = vm.HeightValue!.Value;
+            if (string.Equals(vm.HeightUnit, "ft", StringComparison.OrdinalIgnoreCase))
+            {
+                heightMeters = Math.Round(heightMeters * 0.3048, 0);
+            }
+
             const string sql = @"
 UPDATE obstacles
-SET review_status = @Status,
-    review_comment = @Comment,
-    assigned_to_user_id = @AssignedTo
+SET obstacle_name        = @Name,
+    height_m             = @HeightM,
+    obstacle_description = @Descr,
+    is_draft             = @IsDraft
 WHERE id = @Id;";
 
-            var rows = await con.ExecuteAsync(sql, new
+            using var con = CreateConnection();
+            await con.ExecuteAsync(sql, new
             {
-                Status = status.ToString(),
-                Comment = string.IsNullOrWhiteSpace(reviewComment)
-                    ? null
-                    : reviewComment.Trim(),
-                AssignedTo = userId,
-                Id = id
+                Id = vm.Id,
+                Name = vm.ObstacleName,
+                HeightM = (int?)Math.Round(heightMeters, 0),
+                Descr = vm.Description,
+                IsDraft = vm.SaveAsDraft ? 1 : 0
             });
 
-            if (rows == 0)
-                return NotFound();
-
-            TempData["StatusMessage"] = status == ObstacleStatus.Approved
-                ? "Hinderet er godkjent."
-                : "Hinderet er avvist.";
-
-            return RedirectToAction(nameof(Vis), new { id });
+            return RedirectToAction(nameof(Details), new { id = vm.Id });
         }
+
+        // =========================================================
+        // 7) SLETT HINDER
+        // =========================================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            const string sql = "DELETE FROM obstacles WHERE id = @id;";
+            using var con = CreateConnection();
+            await con.ExecuteAsync(sql, new { id });
+
+            return RedirectToAction(nameof(List));
+        }
+
+        // =========================================================
+        // 8) KART / MAP (om du allerede har en Map()-action,
+        //    kan du lime den inn her i stedet)
+        // =========================================================
+
+        // [HttpGet]
+        // public async Task<IActionResult> Map()
+        // {
+        //     // Hvis du har en fungerende Map()-action fra før,
+        //     // bruk den i stedet for denne stuben.
+        //     using var con = CreateConnection();
+        //     const string sql = @"
+        //     SELECT id,
+        //            obstacle_name    AS ObstacleName,
+        //            height_m         AS HeightMeters,
+        //            is_draft         AS IsDraft,
+        //            created_utc      AS CreatedUtc
+        //     FROM obstacles
+        //     ORDER BY id DESC;";
+        //
+        //     var rows = await con.QueryAsync<ObstacleListItem>(sql);
+        //     return View(rows);
+        // }
     }
 }

@@ -1,0 +1,61 @@
+﻿@model NRLApp.Models.ObstacleEditVm
+
+@{
+    ViewData["Title"] = "Endre hinder";
+}
+
+<div class="screen">
+    <h2>ENDRE HINDER</h2>
+
+    <form asp-action="Edit" method="post" class="mt-3">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+
+        <div class="mb-3">
+            <label asp-for="ObstacleName" class="form-label">Hinder</label>
+            <input asp-for="ObstacleName" class="form-control" />
+            <span asp-validation-for="ObstacleName" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3 row">
+            <div class="col-8">
+                <label asp-for="HeightValue" class="form-label">Høyde</label>
+                <input asp-for="HeightValue" class="form-control" />
+                <span asp-validation-for="HeightValue" class="text-danger"></span>
+            </div>
+            <div class="col-4">
+                <label asp-for="HeightUnit" class="form-label">Enhet</label>
+                <select asp-for="HeightUnit" class="form-select">
+                    <option value="m">meter</option>
+                    <option value="ft">fot</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label">Beskrivelse</label>
+            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+        </div>
+
+        <div class="form-check mb-3">
+            <input asp-for="SaveAsDraft" class="form-check-input" />
+            <label asp-for="SaveAsDraft" class="form-check-label">
+                Lagre som utkast
+            </label>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+                Lagre endringer
+            </button>
+            <a asp-action="Details" asp-route-id="@Model.Id"
+               class="btn btn-outline-secondary">
+                Avbryt
+            </a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

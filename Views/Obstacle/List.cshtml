@@ -1,12 +1,32 @@
-@using NRLApp.Models
 @model IEnumerable<NRLApp.Models.ObstacleListItem>
 
 @{
-    ViewData["Title"] = "Registrerte hindere";
+    ViewData["Title"] = "Registrerte hindre";
 }
 
-<h2>Registrerte hindere</h2>
+<div class="screen">
+    <h2>REGISTRERTE HINDRE</h2>
 
+<<<<<<< HEAD
+    <div class="table-responsive">
+        <table class="table table-sm align-middle">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Hinder</th>
+                    <th>Høyde (m)</th>
+                    <th>Status</th>
+                    <th>Registrert</th>
+                    <th>Innmeldt av</th>
+                    <th>Behandlet av</th>
+                    <th>Vis</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+=======
 <div class="obstacle-table-wrapper">
     <table class="table table-striped align-middle obstacle-table">
     <thead>
@@ -54,15 +74,52 @@
                     <span class="badge @badgeClass">@badgeText</span>
 
                     @if (!string.IsNullOrWhiteSpace(x.ReviewComment))
+>>>>>>> origin/main
                     {
-                        <span class="badge bg-success ms-1">Innsendt</span>
-                        <div class="small text-muted mt-1">@x.ReviewComment</div>
-                    }
-                </td>
-                <td>@x.CreatedUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
-                <td>@(string.IsNullOrWhiteSpace(x.CreatedByUserName) ? "-" : x.CreatedByUserName)</td>
-                <td>@(string.IsNullOrWhiteSpace(x.AssignedToUserName) ? "-" : x.AssignedToUserName)</td>
+                        <tr>
+                            <td>@item.Id</td>
+                            <td>@item.ObstacleName</td>
+                            <td>@item.HeightMeters</td>
+                            <td>
+                                @if (item.IsDraft)
+                                {
+                                    <span class="badge bg-secondary">Utkast</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">Avventer</span>
+                                }
+                            </td>
+                            <td>@item.CreatedUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
 
+<<<<<<< HEAD
+                            @* Disse to er ikke implementert i databasen ennå – vis “-” *@
+                            <td>-</td>
+                            <td>-</td>
+
+                            <td>
+                                <a asp-action="Details"
+                                   asp-route-id="@item.Id"
+                                   class="btn btn-primary btn-sm">
+                                    Vis
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">
+                            Ingen hindre registrert ennå.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+=======
                 <td>
                     <a asp-controller="Obstacle"
                        asp-action="Vis"
@@ -76,3 +133,4 @@
     </tbody>
 </table>
 </div>
+>>>>>>> origin/main

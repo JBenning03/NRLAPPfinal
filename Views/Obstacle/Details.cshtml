@@ -1,0 +1,127 @@
+﻿@using System.Globalization
+@model NRLApp.Models.ObstacleData
+
+<link rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<div class="screen details-shell">
+    <div class="details-header-row">
+        <h1 class="details-title">@Model.ObstacleName</h1>
+
+        @{
+            var statusText = Model.IsDraft ? "Utkast" : "Avventer";
+            var statusClass = Model.IsDraft ? "badge-draft" : "badge-pending";
+        }
+
+        <span class="details-status @statusClass">
+            @statusText
+        </span>
+    </div>
+
+    <div class="details-content-row">
+        <!-- VENSTRE: fakta + knapper -->
+        <div class="details-info">
+            <dl class="details-grid">
+                <div class="details-row">
+                    <dt class="details-label">ID</dt>
+                    <dd class="details-value">@Model.Id</dd>
+                </div>
+
+                <div class="details-row">
+                    <dt class="details-label">Høyde (m)</dt>
+                    <dd class="details-value">@Model.HeightM</dd>
+                </div>
+
+                <div class="details-row">
+                    <dt class="details-label">Registrert</dt>
+                    <dd class="details-value">
+                        @(Model.CreatedUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm", CultureInfo.CurrentCulture))
+                    </dd>
+                </div>
+
+                <div class="details-row">
+                    <dt class="details-label">Beskrivelse</dt>
+                    <dd class="details-value">
+                        @if (string.IsNullOrWhiteSpace(Model.ObstacleDescription))
+                        {
+                            @:-
+                        }
+                        else
+                        {
+                            @Model.ObstacleDescription
+                        }
+                    </dd>
+                </div>
+            </dl>
+
+            <div class="details-actions-row">
+                <a asp-action="Edit"
+                   asp-route-id="@Model.Id"
+                   class="btn btn-primary btn-lg me-3">
+                    Endre
+                </a>
+
+                <form asp-action="Delete"
+                      asp-route-id="@Model.Id"
+                      method="post"
+                      class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit"
+                            class="btn btn-outline-danger btn-lg">
+                        Slett
+                    </button>
+                </form>
+            </div>
+
+            <div class="details-back-row">
+                <a asp-action="List" class="btn btn-outline-secondary btn-lg">
+                    Tilbake til liste
+                </a>
+            </div>
+        </div>
+
+        <!-- HØYRE: kart -->
+        <div class="details-map-wrap">
+            <h2 class="details-map-title">Plassering på kart</h2>
+            <div id="details-map" class="details-map-box"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        (function () {
+            // GeoJSON fra databasen (FeatureCollection fra Leaflet Draw)
+            const geoJson = @Html.Raw(
+                                                    string.IsNullOrWhiteSpace(Model.GeoJson)
+                                                                    ? "{\"type\":\"FeatureCollection\",\"features\":[]}"
+                                                                    : Model.GeoJson
+                                    );
+
+    // fallback sentrum (Kristiansand) hvis noe går galt
+    const defaultCenter = [58.1467, 7.9956];
+
+            const map = L.map('details-map').setView(defaultCenter, 13);
+
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            const layer = L.geoJSON(geoJson).addTo(map);
+
+            if (layer.getLayers().length > 0) {
+                // zoom til geometrien
+                const bounds = layer.getBounds();
+                map.fitBounds(bounds.pad(0.25));
+
+                // marker i sentrum av bounds for tydelig punkt
+                const center = bounds.getCenter();
+                L.marker(center).addTo(map);
+            }
+
+            setTimeout(() => map.invalidateSize(), 80);
+        })();
+    </script>
+}
