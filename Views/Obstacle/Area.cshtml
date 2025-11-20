@@ -2,165 +2,211 @@
     ViewData["Title"] = "Registrer område";
 }
 
-<div class="screen screen-map">
+<div class="screen">
     <h2>REGISTRER OMRÅDE</h2>
 
-    <form asp-action="Area" method="post" class="map-form" id="areaForm">
-        <input type="hidden" name="geoJson" id="geoJson" />
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
+    <form asp-action="Area" method="post">
+        @Html.AntiForgeryToken()
 
         <div class="map-and-tools">
-            <div id="map" class="map-box"></div>
+            <!-- KART -->
+            <div id="map" class="map-frame"></div>
 
-            <div class="tools">
+            <!-- VERKTØY -->
+            <aside class="tools">
                 <div class="tool-title">VERKTØY</div>
-                <button type="button" id="btnPoint" class="tool-btn">Markør</button>
-                <button type="button" id="btnLine" class="tool-btn">Linje</button>
-                <button type="button" id="btnPoly" class="tool-btn">Område</button>
-                <hr />
-                <button type="button" id="btnUndo" class="tool-btn secondary">Angre siste</button>
-                <button type="button" id="btnClear" class="tool-btn danger">Nullstill</button>
-            </div>
+
+                <button type="button" class="tool-btn" id="btnMarker">
+                    Markør
+                </button>
+
+                <button type="button" class="tool-btn" id="btnLine">
+                    Linje
+                </button>
+
+                <button type="button" class="tool-btn danger" id="btnClear">
+                    Nullstill
+                </button>
+            </aside>
         </div>
-        
-        <div class="actions actions-center">
-            <button type="submit" class="primary">Gå videre</button>
+
+        <!-- GEOJSON SENDES TIL CONTROLLEREN -->
+        <input type="hidden" id="geoJson" name="geoJson" />
+
+        <div class="actions actions-center mt-4">
+            <button type="submit" class="btn btn-primary btn-lg px-5">
+                Gå videre
+            </button>
         </div>
     </form>
-
-    @if (TempData["Error"] is string e)
-    {
-        <div class="text-danger mt-2">@e</div>
-    }
 </div>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+@section Scripts {
+    <!-- Leaflet (ta bort hvis dette allerede lastes i _Layout) -->
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
 
-<script>
-    (function () {
-        // Standard-posisjon (Kristiansand) hvis geolokasjon ikke funker
-        const defaultCenter = [58.1467, 7.9956];
-        const defaultZoom = 14;
+    <script>
+        // -------------------------
+        // KARTOPPSETT – Leaflet default (drag uten noe "hold inn"-tull)
+        // -------------------------
+        var map = L.map('map').setView([58.146, 7.995], 12); // Kristiansand-ish
 
-        // Opprett kartet med default view først
-        const map = L.map('map').setView(defaultCenter, defaultZoom);
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-            { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
 
-        // Forsøk å bruke nettleserens geolokasjon (som Google Maps)
-        if ("geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(
-                function (pos) {
-                    const userLat = pos.coords.latitude;
-                    const userLng = pos.coords.longitude;
-                    const userLatLng = [userLat, userLng];
+        // Lag for det vi tegner
+        var drawnLayer = L.featureGroup().addTo(map);
 
-                    // Flytt kartet til brukerens posisjon
-                    map.setView(userLatLng, 15);
+        // Current mode: "marker" | "line"
+        var mode = "marker";
 
-                    // Liten markør for "du er her"
-                    L.circleMarker(userLatLng, {
-                        radius: 6,
-                        color: '#D7261E',
-                        fillColor: '#D7261E',
-                        fillOpacity: 0.9,
-                        weight: 2
-                    })
-                        .addTo(map)
-                        .bindPopup("Du er her")
-                        .openPopup();
-                },
-                function (err) {
-                    console.warn("Geolocation feilet eller ble nektet:", err);
-                    // gjør ingenting → vi beholder defaultCenter
-                },
-                {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 60000
-                }
-            );
+        var marker = null;
+        var line = null;
+        var linePoints = [];
+        var lineVertices = []; // små punkt-markører på linje
+
+        // -------------------------
+        // HJELPEFUNKSJONER
+        // -------------------------
+        function setMode(newMode) {
+            mode = newMode;
+            document.querySelectorAll('.tools .tool-btn').forEach(btn => btn.classList.remove('active'));
+            if (newMode === "marker") document.getElementById('btnMarker').classList.add('active');
+            if (newMode === "line") document.getElementById('btnLine').classList.add('active');
         }
 
-        const drawn = new L.FeatureGroup();
-        map.addLayer(drawn);
+        function updateGeoJsonField() {
+            var gj = drawnLayer.toGeoJSON();
+            document.getElementById('geoJson').value = JSON.stringify(gj);
+        }
 
-        const drawControl = new L.Control.Draw({
-            draw: {
-                marker: {},
-                polyline: {
-                    shapeOptions: { color: '#2c6bed', weight: 3 }
-                },
-                polygon: {
-                    allowIntersection: false,
-                    shapeOptions: { color: '#2c6bed', weight: 2, fillOpacity: 0.15 }
-                },
-                circle: false,
-                rectangle: false,
-                circlemarker: false
-            },
-            edit: { featureGroup: drawn }
-        });
+        function clearMarker() {
+            if (marker) {
+                drawnLayer.removeLayer(marker);
+                marker = null;
+            }
+        }
 
-        function startDraw(mode) {
-            let drawer;
+        function resetLine() {
+            if (line) {
+                drawnLayer.removeLayer(line);
+                line = null;
+            }
+            linePoints = [];
+            lineVertices.forEach(v => drawnLayer.removeLayer(v));
+            lineVertices = [];
+        }
+
+        function clearAll() {
+            clearMarker();
+            resetLine();
+            updateGeoJsonField();
+        }
+
+        function addLineVertex(latlng) {
+            var v = L.circleMarker(latlng, {
+                radius: 6,
+                color: '#003E7E',
+                weight: 2,
+                fillColor: '#ffffff',
+                fillOpacity: 1.0
+            }).addTo(drawnLayer);
+            lineVertices.push(v);
+            linePoints.push(latlng);
+        }
+
+        // -------------------------
+        // CLICK-HÅNDTERING PÅ KART
+        // -------------------------
+        map.on('click', function (e) {
+            var latlng = e.latlng;
+
             if (mode === "marker") {
-                drawer = new L.Draw.Marker(map, drawControl.options.draw.marker);
-            } else if (mode === "polyline") {
-                drawer = new L.Draw.Polyline(map, drawControl.options.draw.polyline);
-            } else if (mode === "polygon") {
-                drawer = new L.Draw.Polygon(map, drawControl.options.draw.polygon);
+                // bare én markør om gangen
+                clearMarker();
+                resetLine();
+                marker = L.marker(latlng).addTo(drawnLayer);
             }
-            if (drawer) {
-                drawer.enable();
+            else if (mode === "line") {
+                clearMarker();
+
+                addLineVertex(latlng);
+
+                if (line) {
+                    drawnLayer.removeLayer(line);
+                }
+                line = L.polyline(linePoints, {
+                    color: '#003E7E',   // tydelig blå linje
+                    weight: 4,
+                    opacity: 1.0
+                }).addTo(drawnLayer);
             }
+
+            updateGeoJsonField();
+        });
+
+        // -------------------------
+        // GEOLOCATION ("Du er her") med egen stil
+        // -------------------------
+        function tryLocate() {
+            if (!navigator.geolocation) return;
+
+            navigator.geolocation.getCurrentPosition(function (pos) {
+                var lat = pos.coords.latitude;
+                var lng = pos.coords.longitude;
+                var here = L.latLng(lat, lng);
+
+                map.setView(here, 14);
+
+                // "Du er her" – rød/hvit sirkel, annerledes enn hinder-markør
+                var youMarker = L.circleMarker(here, {
+                    radius: 8,
+                    color: '#D7261E',
+                    weight: 3,
+                    fillColor: '#ffffff',
+                    fillOpacity: 1.0
+                }).addTo(map);
+
+                youMarker.bindPopup("Du er her").openPopup();
+            },
+            function (err) {
+                console.warn("Geolocation feilet:", err.message);
+            });
         }
 
-        // Kun én markør av gangen
-        map.on(L.Draw.Event.CREATED, function (e) {
-            if (e.layerType === 'marker') {
-                drawn.eachLayer(l => {
-                    if (l instanceof L.Marker) {
-                        drawn.removeLayer(l);
-                    }
-                });
-            }
-            drawn.addLayer(e.layer);
+        tryLocate();
+
+        // -------------------------
+        // KOBLE KNAPPER
+        // -------------------------
+        document.getElementById('btnMarker').addEventListener('click', function () {
+            setMode("marker");
         });
 
-        document.getElementById('btnPoint').onclick = () => startDraw("marker");
-        document.getElementById('btnLine').onclick = () => startDraw("polyline");
-        document.getElementById('btnPoly').onclick = () => startDraw("polygon");
-
-        document.getElementById('btnUndo').onclick = () => {
-            const layers = Object.values(drawn._layers);
-            if (layers.length > 0) {
-                const last = layers[layers.length - 1];
-                drawn.removeLayer(last);
-            }
-        };
-
-        document.getElementById('btnClear').onclick = () => drawn.clearLayers();
-
-        // GeoJson
-        document.getElementById('areaForm').addEventListener('submit', function (e) {
-            const layers = drawn.getLayers();
-            if (layers.length === 0) {
-                alert("Du må plassere en markør, tegne en linje eller et område.");
-                e.preventDefault();
-                return;
-            }
-
-            const fc = drawn.toGeoJSON();
-            document.getElementById('geoJson').value = JSON.stringify(fc);
+        document.getElementById('btnLine').addEventListener('click', function () {
+            setMode("line");
         });
 
-        setTimeout(() => map.invalidateSize(), 80);
-        window.addEventListener('resize', () => {
-            setTimeout(() => map.invalidateSize(), 50);
+        document.getElementById('btnClear').addEventListener('click', function () {
+            clearAll();
         });
-    })();
-</script>
 
+        // Startmodus = markør
+        setMode("marker");
+    </script>
+}
