@@ -1,29 +1,26 @@
 ﻿@using System.Globalization
-@model NRLApp.Models.ObstacleData
+@using NRLApp.Models.Obstacles
+@model ObstacleDetailsVm
 
 <link rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-<!-- Inline overrides for immediate effect: stor info-boks, flyttede/justerte knapper -->
 <style>
-    /* Venstre kolonne wrapper (behåll grid layout uden å påvirke resten) */
     .details-info {
         display: flex !important;
         flex-direction: column !important;
         gap: 1rem !important;
     }
 
-    /* Større, tydelig info-boks som omkranser feltene */
     .info-box {
         border: 1px solid #e6e9ee;
         background: #ffffff;
         border-radius: 12px;
         padding: 22px;
-        min-height: 360px; /* høyde på den store boksen — juster om du vil større */
+        min-height: 360px;
         box-shadow: 0 2px 10px rgba(15,23,42,0.03);
     }
 
-    /* Kompakt info-innhold inni boksen */
     .details-grid {
         margin: 0;
     }
@@ -48,34 +45,36 @@
         line-height: 1.22;
     }
 
-    /* Plassering av Endre / Slett: side-ved-side, liggende rett under info-boksen og sentrert */
-    .actions-under-box {
-        display: flex;
-        justify-content: center; /* sentrer horisontalt i venstre kolonne */
-        gap: 1rem;
-        margin-top: 1rem; /* liten avstand ned fra info-boksen */
+    .badge-approved {
+        background: #dcfce7;
+        color: #065f46;
     }
 
-        /* Gjør knappene litt mer kompakte/proporsjonert */
+    .badge-rejected {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .actions-under-box {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
         .actions-under-box .btn {
             padding: .6rem 1.1rem;
             border-radius: 10px;
             font-size: 1.04rem;
         }
 
-    /* Tilbake-knappen: plassert nederst til venstre i venstre kolonne */
     .details-back-row {
         margin-top: 1.25rem;
         align-self: flex-start;
-        margin-left: 4px; /* lille innrykk fra kanten */
+        margin-left: 4px;
     }
 
-    /* Hvis du ønsker tilbake-knappen helt nederst i kolonnen (kan byttes ved å sette min-height på parent) */
-    /* .details-info { min-height: 520px; } */
-    /* .details-back-row { margin-top: auto; } */
-
     @@media (max-width: 900px) {
-        /* Bruk normal flyt på mobil */
         .info-box {
             min-height: auto;
             padding: 16px;
@@ -94,7 +93,22 @@
 
         @{
             var statusText = Model.IsDraft ? "Utkast" : "Avventer";
-            var statusClass = Model.IsDraft ? "badge-draft" : "badge-pending";
+            var statusClass = Model.IsDraft ? "badge-secondary" : "badge-warning";
+
+            if (!Model.IsDraft)
+            {
+                switch (Model.ReviewStatus)
+                {
+                    case ObstacleStatus.Approved:
+                        statusText = "Godkjent";
+                        statusClass = "badge-approved";
+                        break;
+                    case ObstacleStatus.Rejected:
+                        statusText = "Avvist";
+                        statusClass = "badge-rejected";
+                        break;
+                }
+            }
         }
 
         <span class="details-status @statusClass">
@@ -102,10 +116,14 @@
         </span>
     </div>
 
+    @if (TempData["StatusMessage"] is string statusMessage)
+    {
+        <div class="alert alert-success mt-3" role="status">@statusMessage</div>
+    }
+
     <div class="details-content-row">
         <!-- VENSTRE: fakta + knapper -->
         <div class="details-info">
-            <!-- STOR INFO-BOKS -->
             <div class="info-box">
                 <dl class="details-grid">
                     <div class="details-row">
@@ -115,52 +133,111 @@
 
                     <div class="details-row">
                         <dt class="details-label">Høyde (m)</dt>
-                        <dd class="details-value">@Model.HeightM</dd>
+                        <dd class="details-value">@Model.HeightMeters</dd>
                     </div>
 
                     <div class="details-row">
                         <dt class="details-label">Registrert</dt>
                         <dd class="details-value">
-                            @(Model.CreatedUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm", CultureInfo.CurrentCulture))
+                            @(Model.CreatedUtc.ToLocalTime()
+                                                        .ToString("yyyy-MM-dd HH:mm", CultureInfo.CurrentCulture))
                         </dd>
                     </div>
 
                     <div class="details-row">
                         <dt class="details-label">Beskrivelse</dt>
                         <dd class="details-value">
-                            @if (string.IsNullOrWhiteSpace(Model.ObstacleDescription))
-                            {
-                                @:-
-                            }
-                            else
-                            {
-                                @Model.ObstacleDescription
-                            }
+                            @(
+                                                        string.IsNullOrWhiteSpace(Model.Description)
+                                                        ? "-"
+                                                        : Model.Description
+                                                        )
+                        </dd>
+                    </div>
+
+                    <div class="details-row">
+                        <dt class="details-label">Saksstatus</dt>
+                        <dd class="details-value">@statusText</dd>
+                    </div>
+
+                    <div class="details-row">
+                        <dt class="details-label">Innmeldt av</dt>
+                        <dd class="details-value">
+                            @(string.IsNullOrWhiteSpace(Model.CreatedByUserName) ? "-" : Model.CreatedByUserName)
+                        </dd>
+                    </div>
+
+                    <div class="details-row">
+                        <dt class="details-label">Behandlet av</dt>
+                        <dd class="details-value">
+                            @(string.IsNullOrWhiteSpace(Model.AssignedToUserName) ? "-" : Model.AssignedToUserName)
+                        </dd>
+                    </div>
+
+                    <div class="details-row">
+                        <dt class="details-label">Saks-kommentar</dt>
+                        <dd class="details-value">
+                            @(string.IsNullOrWhiteSpace(Model.ReviewComment) ? "-" : Model.ReviewComment)
                         </dd>
                     </div>
                 </dl>
-            </div> <!-- /.info-box -->
-            <!-- ENDRE / SLETT: side-ved-side, plassert rett under info-boksen -->
-            <div class="actions-under-box">
-                <a asp-action="Edit"
-                   asp-route-id="@Model.Id"
-                   class="btn btn-primary">
-                    Endre
-                </a>
-
-                <form asp-action="Delete"
-                      asp-route-id="@Model.Id"
-                      method="post"
-                      class="d-inline">
-                    @Html.AntiForgeryToken()
-                    <button type="submit"
-                            class="btn btn-outline-danger">
-                        Slett
-                    </button>
-                </form>
             </div>
 
-            <!-- TILBAKE-TIL-LISTE: plassert under knappene, venstrejustert (i hjørne) -->
+            @if (!Model.IsDraft && (User.IsInRole("Admin") || User.IsInRole("Approver")))
+            {
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Godkjenn eller avvis</h5>
+                        <p class="card-text">
+                            Oppdater status og legg ved en kommentar til den som meldte inn hinderet.
+                        </p>
+
+                        <form asp-controller="Obstacle" asp-action="Approve" method="post" id="review-form">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.Id" />
+
+                            <div class="mb-3">
+                                <label class="form-label" for="reviewComment">Kommentar</label>
+                                <textarea class="form-control" id="reviewComment" name="reviewComment" rows="3">@Model.ReviewComment</textarea>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-success">Godkjenn</button>
+
+                                <button type="submit"
+                                        formaction="@Url.Action("Reject", "Obstacle")"
+                                        class="btn btn-danger">
+                                    Avvis
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            }
+
+            @if (!User.IsInRole("Admin") && !User.IsInRole("Approver"))
+            {
+                <!-- ENDRE / SLETT: side-ved-side, plassert rett under info-boksen -->
+                <div class="actions-under-box">
+                    <a asp-action="Edit"
+                       asp-route-id="@Model.Id"
+                       class="btn btn-primary">
+                        Endre
+                    </a>
+
+                    <form asp-action="Delete"
+                          asp-route-id="@Model.Id"
+                          method="post"
+                          class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit"
+                                class="btn btn-outline-danger">
+                            Slett
+                        </button>
+                    </form>
+                </div>
+            }
+
             <div class="details-back-row">
                 <a asp-action="List" class="btn btn-outline-secondary btn-lg">
                     Tilbake til liste
@@ -180,14 +257,13 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         (function () {
-            // GeoJSON fra databasen (FeatureCollection fra Leaflet Draw)
-            const geoJson = @Html.Raw(
-                                                                                                    string.IsNullOrWhiteSpace(Model.GeoJson)
-                                                                                                                                    ? "{\"type\":\"FeatureCollection\",\"features\":[]}"
-                                                                                                                                    : Model.GeoJson
-                                                                    );
 
-        // fallback sentrum (Kristiansand) hvis noe går galt
+            const geoJson = @Html.Raw(
+                            string.IsNullOrWhiteSpace(Model.GeoJson)
+                                    ? "{\"type\":\"FeatureCollection\",\"features\":[]}"
+                                    : Model.GeoJson
+                    );
+
         const defaultCenter = [58.1467, 7.9956];
 
             const map = L.map('details-map').setView(defaultCenter, 13);
@@ -200,11 +276,9 @@
             const layer = L.geoJSON(geoJson).addTo(map);
 
             if (layer.getLayers().length > 0) {
-                // zoom til geometrien
                 const bounds = layer.getBounds();
                 map.fitBounds(bounds.pad(0.25));
 
-                // marker i sentrum av bounds for tydelig punkt
                 const center = bounds.getCenter();
                 L.marker(center).addTo(map);
             }

@@ -2,7 +2,10 @@
     var currentController = (string?)ViewContext.RouteData.Values["controller"] ?? "";
     var hideMenu = string.Equals(currentController, "Account", StringComparison.OrdinalIgnoreCase);
 
-    string? userEmail = User?.Identity?.IsAuthenticated == true ? User.Identity!.Name : null;
+    string? userEmail = User?.Identity?.IsAuthenticated == true
+        ? User.Identity?.Name
+        : null;
+
     string? userNameShort = null;
     string? userInitials = null;
 
@@ -60,41 +63,52 @@
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarNav">
-                   @if (!hideMenu)
-{
-    <ul class="navbar-nav me-auto">
-        <li class="nav-item">
-            <a class="nav-link" asp-controller="Obstacle" asp-action="Area">Skjema</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" asp-controller="Obstacle" asp-action="List">Registrerte</a>
-        </li>
-    </ul>
+                    @if (!hideMenu)
+                    {
+                        <ul class="navbar-nav me-auto">
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Admin" asp-action="Users">Brukerroller</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Obstacle" asp-action="Area">Skjema</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Obstacle" asp-action="List">Registrerte</a>
+                                </li>
+                            }
+                        </ul>
 
-    @if (User?.Identity?.IsAuthenticated == true)
-    {
-        <div class="ms-auto d-flex align-items-center gap-3">
-            <div class="user-info d-flex align-items-center">
-                @if (!string.IsNullOrWhiteSpace(userInitials))
-                {
-                    <div class="user-avatar me-2">
-                        @userInitials
-                    </div>
-                }
-                <div class="user-name text-truncate">
-                    @userNameShort
-                </div>
-            </div>
+                        @if (User?.Identity?.IsAuthenticated == true)
+                        {
+                            <div class="ms-auto d-flex align-items-center gap-3">
+                                <div class="user-info d-flex align-items-center">
+                                    @if (!string.IsNullOrWhiteSpace(userInitials))
+                                    {
+                                        <div class="user-avatar me-2">
+                                            @userInitials
+                                        </div>
+                                    }
+                                    <div class="user-name text-truncate">
+                                        @userNameShort
+                                    </div>
+                                </div>
 
-            <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
-                @Html.AntiForgeryToken()
-                <button type="submit" class="btn btn-outline-danger btn-sm logout-btn">
-                    <i class="bi bi-box-arrow-right"></i> Logg ut
-                </button>
-            </form>
-        </div>
-    }
-} 
+                                <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-outline-danger btn-sm logout-btn">
+                                        <i class="bi bi-box-arrow-right"></i> Logg ut
+                                    </button>
+                                </form>
+                            </div>
+                        }
+                    }
+                </div> <!-- /collapse -->
+            </div> <!-- /container-fluid -->
         </nav>
     </header>
 

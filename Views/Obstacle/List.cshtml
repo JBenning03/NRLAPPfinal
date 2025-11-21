@@ -1,4 +1,5 @@
-@model IEnumerable<NRLApp.Models.ObstacleListItem>
+@using NRLApp.Models.Obstacles
+@model ObstacleListVm
 
 @{
     ViewData["Title"] = "Registrerte hindre";
@@ -6,6 +7,59 @@
 
 <div class="screen">
     <h2>REGISTRERTE HINDRE</h2>
+
+    <div class="obstacle-filter card mb-3">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-sm-2 col-lg-1">
+                    <label class="form-label" for="filter-id">ID</label>
+                    <input type="number" class="form-control" id="filter-id" name="Id" value="@Model.Filter.Id" />
+                </div>
+
+                <div class="col-sm-4 col-lg-3">
+                    <label class="form-label" for="filter-name">Hinder</label>
+                    <input type="text" class="form-control" id="filter-name" name="ObstacleName" value="@Model.Filter.ObstacleName" />
+                </div>
+
+                <div class="col-sm-4 col-lg-2">
+                    <label class="form-label" for="filter-min-height">Min høyde (m)</label>
+                    <input type="number" class="form-control" id="filter-min-height" name="MinHeightMeters" value="@Model.Filter.MinHeightMeters" />
+                </div>
+
+                <div class="col-sm-4 col-lg-2">
+                    <label class="form-label" for="filter-max-height">Maks høyde (m)</label>
+                    <input type="number" class="form-control" id="filter-max-height" name="MaxHeightMeters" value="@Model.Filter.MaxHeightMeters" />
+                </div>
+
+                <div class="col-sm-4 col-lg-2">
+                    <label class="form-label" for="filter-status">Status</label>
+                    <select class="form-select" id="filter-status" name="Status">
+                        <option value="" selected="@(Model.Filter.Status is null)">Alle</option>
+                        <option value="Draft" selected="@(Model.Filter.Status == ObstacleListStatusFilter.Draft)">Utkast</option>
+                        <option value="Pending" selected="@(Model.Filter.Status == ObstacleListStatusFilter.Pending)">Avventer</option>
+                    </select>
+                </div>
+
+                <div class="col-sm-4 col-lg-2">
+                    <label class="form-label" for="filter-created-from">Registrert fra</label>
+                    <input type="date" class="form-control" id="filter-created-from" name="CreatedFrom" value="@(Model.Filter.CreatedFrom?.ToString("yyyy-MM-dd"))" />
+                </div>
+
+                <div class="col-sm-4 col-lg-2">
+                    <label class="form-label" for="filter-created-to">Registrert til</label>
+                    <input type="date" class="form-control" id="filter-created-to" name="CreatedTo" value="@(Model.Filter.CreatedTo?.ToString("yyyy-MM-dd"))" />
+                </div>
+
+                <div class="col-sm-4 col-lg-2">
+                    <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+                </div>
+
+                <div class="col-sm-4 col-lg-2">
+                    <a class="btn btn-outline-secondary w-100" href="@Url.Action("List", "Obstacle")">Nullstill</a>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <div class="obstacle-table-wrapper">
         <table class="table table-striped align-middle obstacle-table">
@@ -22,29 +76,45 @@
                 </tr>
             </thead>
             <tbody>
-                @if (Model != null && Model.Any())
+                @if (Model?.Items != null && Model.Items.Any())
                 {
-                    foreach (var x in Model)
+                    foreach (var x in Model.Items)
                     {
                         <tr>
                             <td>@x.Id</td>
                             <td>@(string.IsNullOrWhiteSpace(x.ObstacleName) ? "(uten navn)" : x.ObstacleName)</td>
                             <td>@(x.HeightMeters?.ToString() ?? "-")</td>
                             <td>
-                                @if (x.IsDraft)
-                                {
-                                    <span class="badge bg-secondary">Utkast</span>
+                                @{
+                                    var badgeClass = "badge bg-warning text-dark";
+                                    var badgeText = "Avventer";
+
+                                    if (x.IsDraft)
+                                    {
+                                        badgeClass = "badge bg-secondary";
+                                        badgeText = "Utkast";
+                                    }
+                                    else
+                                    {
+                                        switch (x.ReviewStatus)
+                                        {
+                                            case ObstacleStatus.Approved:
+                                                badgeClass = "badge bg-success";
+                                                badgeText = "Godkjent";
+                                                break;
+                                            case ObstacleStatus.Rejected:
+                                                badgeClass = "badge bg-danger";
+                                                badgeText = "Avvist";
+                                                break;
+                                        }
+                                    }
                                 }
-                                else
-                                {
-                                    <span class="badge bg-warning text-dark">Avventer</span>
-                                }
+                                <span class="@badgeClass">@badgeText</span>
                             </td>
                             <td>@x.CreatedUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
 
-                            @* Ikke implementert ennå → vis “-” *@
-                            <td>-</td>
-                            <td>-</td>
+                            <td>@(string.IsNullOrWhiteSpace(x.CreatedByUserName) ? "-" : x.CreatedByUserName)</td>
+                            <td>@(string.IsNullOrWhiteSpace(x.AssignedToUserName) ? "-" : x.AssignedToUserName)</td>
 
                             <td>
                                 <a asp-action="Details"

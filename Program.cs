@@ -156,9 +156,14 @@ using (var scope = app.Services.CreateScope())
     const string adminPass = "Admin!123!";
     const string adminRole = "Admin";
     const string approverRole = "Approver";
+    const string pilotRole = "Pilot";
+    const string crewRole = "Crew";
 
-    if (!await roleManager.RoleExistsAsync(approverRole))
-        await roleManager.CreateAsync(new IdentityRole(approverRole));
+    foreach (var roleName in new[] { adminRole, approverRole, pilotRole, crewRole })
+    {
+        if (!await roleManager.RoleExistsAsync(roleName))
+            await roleManager.CreateAsync(new IdentityRole(roleName));
+    }
 
     if (!userManager.Users.Any())
     {

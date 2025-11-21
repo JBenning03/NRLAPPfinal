@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using NRLApp.Models;
+using NRLApp.Models.Account;
 
 namespace NRLApp.Controllers
 {
@@ -46,11 +46,16 @@ namespace NRLApp.Controllers
 
             if (result.Succeeded)
             {
+                var user = await _userManager.FindByNameAsync(model.Email);
+
+                if (user != null && await _userManager.IsInRoleAsync(user, "Admin"))
+                    return RedirectToAction("Users", "Admin");
+
                 // Naviger til ønsket side etter innlogging
                 if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
                     return Redirect(returnUrl);
 
-                // Midlertidig: send til “Obstable/Area” eller annen hovedside
+                // Midlertidig: send til “Obstacle/Area” eller annen hovedside
                 return RedirectToAction("Area", "Obstacle");
             }
 
@@ -112,12 +117,5 @@ namespace NRLApp.Controllers
             await _signInManager.SignOutAsync();
             return RedirectToAction("Login", "Account");
         }
-
-        // (Valgfritt) 403 visning
-        [HttpGet]
-        public IActionResult AccessDenied() => View();
     }
 }
-
-
-
