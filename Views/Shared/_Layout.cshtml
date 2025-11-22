@@ -66,7 +66,7 @@
                     @if (!hideMenu)
                     {
                         <ul class="navbar-nav me-auto">
-                            @if (User.IsInRole("Admin"))
+                            @if (User?.IsInRole("Admin") == true)
                             {
                                 <li class="nav-item">
                                     <a class="nav-link" asp-controller="Admin" asp-action="Users">Brukerroller</a>
@@ -126,6 +126,8 @@
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     @RenderSection("Scripts", required: false)
 </body>
 </html>
+
