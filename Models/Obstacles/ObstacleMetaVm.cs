@@ -13,11 +13,10 @@ namespace NRLApp.Models.Obstacles
     public class ObstacleMetaVm
     {
         [Display(Name = "Kategori")]
-        public string? Category { get; set; }   // 👈 NY PROPERTY
+        public string? Category { get; set; }
 
-        [Required(ErrorMessage = "Skriv hva det er.")]
         [Display(Name = "Hinder")]
-        public string? ObstacleName { get; set; }
+        public string? ObstacleName { get; set; } // ikke lenger [Required]
 
         [Required(ErrorMessage = "Oppgi høyde.")]
         [Range(0, 10000, ErrorMessage = "Høyden må være et tall ≥ 0.")]

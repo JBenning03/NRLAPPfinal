@@ -94,8 +94,10 @@ namespace NRLApp.Controllers
             var geoJsonToSave = string.IsNullOrWhiteSpace(s.GeoJson) ? "{}" : s.GeoJson;
 
             // Validering
-            if (string.IsNullOrWhiteSpace(vm.ObstacleName))
-                ModelState.AddModelError(nameof(vm.ObstacleName), "Skriv hva det er.");
+
+            // nå krever vi kategori i stedet for hinder-tekst
+            if (string.IsNullOrWhiteSpace(vm.Category))
+                ModelState.AddModelError(nameof(vm.Category), "Velg kategori.");
 
             if (vm.HeightValue is null || vm.HeightValue < 0)
                 ModelState.AddModelError(nameof(vm.HeightValue), "Oppgi høyde.");
@@ -139,8 +141,10 @@ VALUES (
             await con.ExecuteAsync(sql, new
             {
                 GeoJson = geoJsonToSave,
-                Name = vm.ObstacleName,
-                Category = vm.Category,     // 👈 LAGRES I DB
+                Name = string.IsNullOrWhiteSpace(vm.ObstacleName)
+         ? vm.Category
+         : vm.ObstacleName,
+                Category = vm.Category,
                 HeightM = (int?)Math.Round(heightMeters, 0),
                 Descr = vm.Description,
                 IsDraft = isDraft ? 1 : 0,
