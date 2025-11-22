@@ -39,35 +39,42 @@ namespace NRLApp.Controllers
                 return View(model);
 
             var result = await _signInManager.PasswordSignInAsync(
-                userName: model.Email,
-                password: model.Password,
-                isPersistent: model.RememberMe,
+                model.Email,
+                model.Password,
+                model.RememberMe,
                 lockoutOnFailure: false);
 
             if (result.Succeeded)
             {
-                var user = await _userManager.FindByNameAsync(model.Email);
-
-                if (user != null && await _userManager.IsInRoleAsync(user, "Admin"))
-                    return RedirectToAction("Users", "Admin");
-
-                // Naviger til ønsket side etter innlogging
+                // Hvis vi kom hit via en ReturnUrl (for eksempel [Authorize]-redirect),
+                // og den er lokal, bruk den først.
                 if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
                     return Redirect(returnUrl);
 
-                // Midlertidig: send til “Obstacle/Area” eller annen hovedside
+                // Finn bruker og sjekk roller
+                var user = await _userManager.FindByNameAsync(model.Email);
+                if (user != null)
+                {
+                    // 1) Admin: til rolle-siden
+                    if (await _userManager.IsInRoleAsync(user, "Admin"))
+                        return RedirectToAction("Users", "Admin");
+
+                    // 2) Approver: til registrerte hinder
+                    if (await _userManager.IsInRoleAsync(user, "Approver"))
+                        return RedirectToAction("List", "Obstacle");
+                }
+
+                // 3) Standard (Pilot, Crew, andre): til skjema
                 return RedirectToAction("Area", "Obstacle");
             }
 
             if (result.IsLockedOut)
             {
-                ModelState.AddModelError(string.Empty, "Kontoen er midlertidig låst.");
-            }
-            else
-            {
-                ModelState.AddModelError(string.Empty, "Feil e-post eller passord.");
+                ModelState.AddModelError(string.Empty, "Kontoen er låst.");
+                return View(model);
             }
 
+            ModelState.AddModelError(string.Empty, "Ugyldig brukernavn eller passord.");
             return View(model);
         }
 

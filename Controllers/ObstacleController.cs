@@ -176,62 +176,68 @@ VALUES (
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+            // Admin og Approver skal se alle.
+            // Pilot / Crew (og andre) skal bare se egne innmeldinger.
+            var isReviewer = User.IsInRole("Admin") || User.IsInRole("Approver");
+
             using var con = CreateConnection();
             var where = new List<string>();
             var parameters = new DynamicParameters();
 
-            // Flere if-blokker her bygger opp SQL WHERE-delen
+            // Begrens til egne hindringer hvis man ikke er reviewer
+            if (!isReviewer && !string.IsNullOrWhiteSpace(userId))
+            {
+                where.Add("o.created_by_user_id = @UserId");
+                parameters.Add("UserId", userId);
+            }
+
             if (filter.Id.HasValue)
             {
-                where.Add("id = @Id");
+                where.Add("o.id = @Id");
                 parameters.Add("Id", filter.Id.Value);
             }
 
             if (!string.IsNullOrWhiteSpace(filter.ObstacleName))
             {
-                where.Add("LOWER(obstacle_name) LIKE @ObstacleName");
+                where.Add("LOWER(o.obstacle_name) LIKE @ObstacleName");
                 parameters.Add("ObstacleName", $"%{filter.ObstacleName.Trim().ToLowerInvariant()}%");
             }
 
-            // Filtrering på høyde (min og max)
             if (filter.MinHeightMeters.HasValue)
             {
-                where.Add("height_m >= @MinHeight");
+                where.Add("o.height_m >= @MinHeight");
                 parameters.Add("MinHeight", filter.MinHeightMeters.Value);
             }
 
             if (filter.MaxHeightMeters.HasValue)
             {
-                where.Add("height_m <= @MaxHeight");
+                where.Add("o.height_m <= @MaxHeight");
                 parameters.Add("MaxHeight", filter.MaxHeightMeters.Value);
             }
 
-            // Filtrer på status (draft/publisert)
             if (filter.Status.HasValue)
             {
-                where.Add("is_draft = @IsDraft");
+                where.Add("o.is_draft = @IsDraft");
                 parameters.Add("IsDraft",
                     filter.Status.Value == ObstacleListStatusFilter.Draft ? 1 : 0);
             }
 
-            // Datoer konverteres til UTC før SQL
             var createdFromUtc = NormalizeToUtc(filter.CreatedFrom);
             if (createdFromUtc.HasValue)
             {
-                where.Add("created_utc >= @CreatedFrom");
+                where.Add("o.created_utc >= @CreatedFrom");
                 parameters.Add("CreatedFrom", createdFromUtc.Value);
             }
 
             var createdToUtc = NormalizeToUtc(filter.CreatedTo);
             if (createdToUtc.HasValue)
             {
-                where.Add("created_utc <= @CreatedTo");
+                where.Add("o.created_utc <= @CreatedTo");
                 parameters.Add("CreatedTo", createdToUtc.Value);
             }
 
             var whereClause = where.Count == 0 ? "" : $" WHERE {string.Join(" AND ", where)}";
 
-            // Hent liste
             var sql = $@"
 SELECT o.id,
        o.obstacle_name        AS ObstacleName,
