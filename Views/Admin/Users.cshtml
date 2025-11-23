@@ -1,16 +1,19 @@
-﻿@model NRLApp.Models.AdminRoleListVm
-@{
-    ViewData["Title"] = "Administrer roller";
-    var roles = ViewBag.AssignableRoles as string[] ?? Array.Empty<string>();
+﻿@using NRLApp.Models
+@model NRLApp.Models.AdminRoleListVm
 
-    // Samme e-post som vi beskytter i controlleren
-    var protectedAdminEmails = new[] { "admin@nrl.local" };
+@{
+    ViewData["Title"] = "Administrer roller og organisasjoner";
+
+    var roles = ViewBag.AssignableRoles as string[] ?? Array.Empty<string>();
+    var orgs = ViewBag.Organizations as IEnumerable<OrganizationVm> ?? Enumerable.Empty<OrganizationVm>();
+    var userOrgMap = ViewBag.UserOrgMap as IDictionary<string, int>;
 }
+
 
 <div class="screen">
     <div class="d-flex align-items-center justify-content-between mb-3">
         <h1 class="mb-0">Brukerroller</h1>
-        <p class="text-muted mb-0">Sett rolle til Pilot, Crew eller Approver.</p>
+        <p class="text-muted mb-0">Sett rolle og organisasjon for brukere.</p>
     </div>
 
     @if (TempData["Status"] is string status)
@@ -28,19 +31,34 @@
             <thead>
                 <tr>
                     <th>E-post</th>
-                    <th class="w-25">Gjeldende rolle</th>
-                    <th class="w-25">Ny rolle</th>
-                    <th class="text-end">Slett</th>
+                    <th>Gjeldende rolle</th>
+                    <th>Organisasjon</th>
+                    <th class="w-25">Ny rolle / organisasjon</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var user in Model.Users)
                 {
-                    var isProtected = !string.IsNullOrWhiteSpace(user.Email)
-                    && protectedAdminEmails.Contains(user.Email, StringComparer.OrdinalIgnoreCase);
+                    int? selectedOrgId = null;
+                    if (userOrgMap != null && userOrgMap.TryGetValue(user.UserId, out var orgIdFromMap))
+                    {
+                        selectedOrgId = orgIdFromMap;
+                    }
+
+                    var currentOrgName = "";
+                    if (selectedOrgId.HasValue)
+                    {
+                        var orgRow = orgs.FirstOrDefault(o => o.Id == selectedOrgId.Value);
+                        if (orgRow != null)
+                        {
+                            currentOrgName = orgRow.Name;
+                        }
+                    }
 
                     <tr>
                         <td>@(user.Email ?? "(uten e-post)")</td>
+
                         <td>
                             @if (string.IsNullOrWhiteSpace(user.CurrentRole))
                             {
@@ -51,39 +69,61 @@
                                 <span class="badge bg-primary">@user.CurrentRole</span>
                             }
                         </td>
+
                         <td>
-                            <form asp-action="UpdateRole" method="post" class="d-flex gap-2 align-items-center">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="UserId" value="@user.UserId" />
-                                <select name="Role" class="form-select">
-                                    @foreach (var role in roles)
-                                    {
-                                        <option value="@role" selected="@(string.Equals(role, user.CurrentRole, StringComparison.OrdinalIgnoreCase) ? "selected" : null)">
-                                            @role
-                                        </option>
-                                    }
-                                </select>
-                                <button type="submit" class="btn btn-primary">Oppdater</button>
-                            </form>
-                        </td>
-                        <td class="text-end">
-                            @if (isProtected)
+                            @if (string.IsNullOrWhiteSpace(currentOrgName))
                             {
-                                <span class="text-muted">Kan ikke slettes</span>
+                                <span class="text-muted">Ingen satt</span>
                             }
                             else
                             {
-                                <form asp-action="DeleteUser"
-                                      method="post"
-                                      onsubmit="return confirm('Er du sikker på at du vil slette denne brukeren?');"
-                                      class="d-inline">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="userId" value="@user.UserId" />
-                                    <button type="submit" class="btn btn-outline-danger btn-sm">
-                                        Slett
-                                    </button>
-                                </form>
+                                <span class="badge bg-secondary">@currentOrgName</span>
                             }
+                        </td>
+
+                        <td>
+                            <form asp-action="UpdateRole" method="post" class="d-flex flex-column gap-2">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="UserId" value="@user.UserId" />
+
+                                <div class="d-flex gap-2">
+                                    <select name="Role" class="form-select">
+                                        @foreach (var role in roles)
+                                        {
+                                            <option value="@role"
+                                                    selected="@(string.Equals(role, user.CurrentRole, StringComparison.OrdinalIgnoreCase) ? "selected" : null)">
+                                                @role
+                                            </option>
+                                        }
+                                    </select>
+
+                                    <select name="OrganizationId" class="form-select">
+                                        <option value="">(ingen)</option>
+                                        @foreach (var org in orgs)
+                                        {
+                                            <option value="@org.Id"
+                                                    selected="@(selectedOrgId.HasValue && selectedOrgId.Value == org.Id ? "selected" : null)">
+                                                @org.Name
+                                            </option>
+                                        }
+                                    </select>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary btn-sm mt-1">
+                                    Oppdater
+                                </button>
+                            </form>
+                        </td>
+
+                        <td>
+                            <form asp-action="DeleteUser" method="post"
+                                  onsubmit="return confirm('Er du sikker på at du vil slette brukeren @user.Email?');">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="userId" value="@user.UserId" />
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    Slett
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 }

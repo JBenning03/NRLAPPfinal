@@ -94,26 +94,48 @@ namespace NRLApp.Controllers
             var geoJsonToSave = string.IsNullOrWhiteSpace(s.GeoJson) ? "{}" : s.GeoJson;
 
             // Validering
-
-            // nå krever vi kategori i stedet for hinder-tekst
-            if (string.IsNullOrWhiteSpace(vm.Category))
-                ModelState.AddModelError(nameof(vm.Category), "Velg kategori.");
+            if (string.IsNullOrWhiteSpace(vm.ObstacleName) && string.IsNullOrWhiteSpace(vm.Category))
+            {
+                ModelState.AddModelError(nameof(vm.ObstacleName), "Skriv hva det er, eller velg en kategori.");
+            }
 
             if (vm.HeightValue is null || vm.HeightValue < 0)
+            {
                 ModelState.AddModelError(nameof(vm.HeightValue), "Oppgi høyde.");
+            }
 
             if (!ModelState.IsValid)
+            {
                 return View(vm);
+            }
 
-            // Konverter høyde hvis bruker har valgt ft
+            // Konverter høyde til meter
             double heightMeters = vm.HeightValue!.Value;
             if (string.Equals(vm.HeightUnit, "ft", StringComparison.OrdinalIgnoreCase))
+            {
                 heightMeters = Math.Round(heightMeters * 0.3048, 0);
+            }
 
             bool isDraft = string.Equals(action, "draft", StringComparison.OrdinalIgnoreCase) || vm.SaveAsDraft;
 
             // Hent bruker-ID
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            await using var con = CreateConnection();
+
+            // Finn organisasjon for brukeren (hvis satt)
+            int? orgId = null;
+            if (!string.IsNullOrEmpty(userId))
+            {
+                const string orgSql = @"
+SELECT organization_id
+FROM user_organizations
+WHERE user_id = @UserId
+LIMIT 1;
+";
+
+                orgId = await con.ExecuteScalarAsync<int?>(orgSql, new { UserId = userId });
+            }
 
             const string sql = @"
 INSERT INTO obstacles (
@@ -124,7 +146,8 @@ INSERT INTO obstacles (
     obstacle_description,
     is_draft,
     created_utc,
-    created_by_user_id
+    created_by_user_id,
+    organization_id
 )
 VALUES (
     @GeoJson,
@@ -134,25 +157,25 @@ VALUES (
     @Descr,
     @IsDraft,
     UTC_TIMESTAMP(),
-    @CreatedByUserId
+    @CreatedByUserId,
+    @OrganizationId
 );";
 
-            using var con = CreateConnection();
             await con.ExecuteAsync(sql, new
             {
                 GeoJson = geoJsonToSave,
-                Name = string.IsNullOrWhiteSpace(vm.ObstacleName)
-         ? vm.Category
-         : vm.ObstacleName,
+                // Hvis ObstacleName er tom, bruker vi kategori-navnet som "tittel"
+                Name = string.IsNullOrWhiteSpace(vm.ObstacleName) ? vm.Category : vm.ObstacleName,
                 Category = vm.Category,
                 HeightM = (int?)Math.Round(heightMeters, 0),
                 Descr = vm.Description,
                 IsDraft = isDraft ? 1 : 0,
-                CreatedByUserId = userId
+                CreatedByUserId = userId,
+                OrganizationId = orgId
             });
 
+            // Tøm tempdata og gå til takk-siden
             DrawJson = null;
-
             return RedirectToAction(nameof(Thanks), new { draft = isDraft });
         }
 
@@ -247,10 +270,12 @@ SELECT o.id,
        o.review_status        AS ReviewStatus,
        o.review_comment       AS ReviewComment,
        createdUser.UserName   AS CreatedByUserName,
-       assignedUser.UserName  AS AssignedToUserName
+       assignedUser.UserName  AS AssignedToUserName,
+       org.name               AS OrganizationName
 FROM obstacles o
 LEFT JOIN AspNetUsers createdUser  ON createdUser.Id = o.created_by_user_id
 LEFT JOIN AspNetUsers assignedUser ON assignedUser.Id = o.assigned_to_user_id
+LEFT JOIN organizations org        ON org.id = o.organization_id
 {whereClause}
 ORDER BY o.id DESC;";
 

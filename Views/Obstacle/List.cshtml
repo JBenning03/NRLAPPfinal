@@ -70,67 +70,59 @@
                     <th>Høyde (m)</th>
                     <th>Status</th>
                     <th>Registrert</th>
-                    <th>Innmeldt av</th>
+                    <th>Organisasjon</th>
                     <th>Behandlet av</th>
                     <th>Vis</th>
                 </tr>
             </thead>
             <tbody>
-                @if (Model?.Items != null && Model.Items.Any())
-                {
-                    foreach (var x in Model.Items)
-                    {
-                        <tr>
-                            <td>@x.Id</td>
-                            <td>@(string.IsNullOrWhiteSpace(x.ObstacleName) ? "(uten navn)" : x.ObstacleName)</td>
-                            <td>@(x.HeightMeters?.ToString() ?? "-")</td>
-                            <td>
-                                @{
-                                    var badgeClass = "badge bg-warning text-dark";
-                                    var badgeText = "Avventer";
-
-                                    if (x.IsDraft)
-                                    {
-                                        badgeClass = "badge bg-secondary";
-                                        badgeText = "Utkast";
-                                    }
-                                    else
-                                    {
-                                        switch (x.ReviewStatus)
-                                        {
-                                            case ObstacleStatus.Approved:
-                                                badgeClass = "badge bg-success";
-                                                badgeText = "Godkjent";
-                                                break;
-                                            case ObstacleStatus.Rejected:
-                                                badgeClass = "badge bg-danger";
-                                                badgeText = "Avvist";
-                                                break;
-                                        }
-                                    }
-                                }
-                                <span class="@badgeClass">@badgeText</span>
-                            </td>
-                            <td>@x.CreatedUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
-
-                            <td>@(string.IsNullOrWhiteSpace(x.CreatedByUserName) ? "-" : x.CreatedByUserName)</td>
-                            <td>@(string.IsNullOrWhiteSpace(x.AssignedToUserName) ? "-" : x.AssignedToUserName)</td>
-
-                            <td>
-                                <a asp-action="Details"
-                                   asp-route-id="@x.Id"
-                                   class="btn btn-primary btn-sm">
-                                    Vis
-                                </a>
-                            </td>
-                        </tr>
-                    }
-                }
-                else
+                @foreach (var x in Model.Items)
                 {
                     <tr>
-                        <td colspan="8" class="text-center text-muted py-4">
-                            Ingen hindre registrert ennå.
+                        <td>@x.Id</td>
+                        <td>@(string.IsNullOrWhiteSpace(x.ObstacleName) ? "(uten navn)" : x.ObstacleName)</td>
+                        <td>@(x.HeightMeters?.ToString() ?? "-")</td>
+                        <td>
+                            @{
+                                var badgeClass = "badge bg-warning text-dark";
+                                var badgeText = "Avventer";
+
+                                if (x.IsDraft)
+                                {
+                                    badgeClass = "badge bg-secondary";
+                                    badgeText = "Utkast";
+                                }
+                                else
+                                {
+                                    switch (x.ReviewStatus)
+                                    {
+                                        case ObstacleStatus.Approved:
+                                            badgeClass = "badge bg-success";
+                                            badgeText = "Godkjent";
+                                            break;
+                                        case ObstacleStatus.Rejected:
+                                            badgeClass = "badge bg-danger";
+                                            badgeText = "Avvist";
+                                            break;
+                                    }
+                                }
+                            }
+                            <span class="@badgeClass">@badgeText</span>
+                        </td>
+                        <td>@x.CreatedUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+
+                        <!-- NY: Organisasjon -->
+                        <td>@(string.IsNullOrWhiteSpace(x.OrganizationName) ? "-" : x.OrganizationName)</td>
+
+                        <!-- Behandlet av (samme som før) -->
+                        <td>@(string.IsNullOrWhiteSpace(x.AssignedToUserName) ? "-" : x.AssignedToUserName)</td>
+
+                        <td>
+                            <a asp-action="Details"
+                               asp-route-id="@x.Id"
+                               class="btn btn-primary btn-sm">
+                                Vis
+                            </a>
                         </td>
                     </tr>
                 }

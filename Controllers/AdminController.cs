@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Dapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MySqlConnector;
 using NRLApp.Models;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace NRLApp.Controllers
 {
@@ -14,19 +13,33 @@ namespace NRLApp.Controllers
     {
         private static readonly string[] AssignableRoles = new[] { "Pilot", "Crew", "Approver" };
 
-        // E-post(er) til brukere som IKKE skal kunne slettes
-        private static readonly string[] ProtectedAdminEmails = new[]
-        {
-            "admin@nrl.local"   // juster hvis dere har et annet hoved-admin-brukernavn
-        };
-
         private readonly UserManager<IdentityUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IConfiguration _config;
 
-        public AdminController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+        public AdminController(
+            UserManager<IdentityUser> userManager,
+            RoleManager<IdentityRole> roleManager,
+            IConfiguration config)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _config = config;
+        }
+
+        private MySqlConnection CreateConnection()
+            => new MySqlConnection(_config.GetConnectionString("DefaultConnection"));
+
+        private sealed class OrgRow
+        {
+            public int Id { get; set; }
+            public string Name { get; set; } = "";
+        }
+
+        private sealed class UserOrgRow
+        {
+            public string UserId { get; set; } = "";
+            public int OrganizationId { get; set; }
         }
 
         [HttpGet]
@@ -48,7 +61,30 @@ namespace NRLApp.Controllers
                 });
             }
 
+            // --- HENT ORGANISASJONER STERKT TYPET ---
+            await using (var con = new MySqlConnector.MySqlConnection(
+                             _config.GetConnectionString("DefaultConnection")))
+            {
+                var orgs = await con.QueryAsync<OrganizationVm>(@"
+            SELECT 
+                id   AS Id,
+                name AS Name
+            FROM organizations
+            ORDER BY name;");
+
+                ViewBag.Organizations = orgs;
+
+                var userOrgRows = await con.QueryAsync<(string UserId, int OrganizationId)>(@"
+            SELECT user_id   AS UserId,
+                   organization_id AS OrganizationId
+            FROM user_organizations;");
+
+                var userOrgMap = userOrgRows.ToDictionary(x => x.UserId, x => x.OrganizationId);
+                ViewBag.UserOrgMap = userOrgMap;
+            }
+
             ViewBag.AssignableRoles = AssignableRoles;
+
             return View(vm);
         }
 
@@ -69,6 +105,7 @@ namespace NRLApp.Controllers
                 return RedirectToAction(nameof(Users));
             }
 
+            // 1) Oppdater rolle
             foreach (var role in AssignableRoles)
             {
                 if (await _userManager.IsInRoleAsync(user, role))
@@ -80,30 +117,44 @@ namespace NRLApp.Controllers
 
             await _userManager.AddToRoleAsync(user, vm.Role);
 
-            TempData["Status"] = $"Oppdatert rolle for {user.Email ?? user.UserName} til {vm.Role}.";
+            // 2) Oppdater organisasjon (fra form-feltet "OrganizationId")
+            int? orgId = null;
+            var orgValue = Request.Form["OrganizationId"].FirstOrDefault();
+            if (int.TryParse(orgValue, out var parsed))
+            {
+                orgId = parsed;
+            }
+
+            using (var con = CreateConnection())
+            {
+                if (orgId.HasValue)
+                {
+                    const string upsertSql = @"
+INSERT INTO user_organizations (user_id, organization_id)
+VALUES (@UserId, @OrgId)
+ON DUPLICATE KEY UPDATE organization_id = VALUES(organization_id);";
+
+                    await con.ExecuteAsync(upsertSql, new
+                    {
+                        UserId = user.Id,
+                        OrgId = orgId.Value
+                    });
+                }
+                else
+                {
+                    const string deleteSql = "DELETE FROM user_organizations WHERE user_id = @UserId;";
+                    await con.ExecuteAsync(deleteSql, new { UserId = user.Id });
+                }
+            }
+
+            TempData["Status"] = $"Oppdatert rolle og organisasjon for {user.Email ?? user.UserName}.";
             return RedirectToAction(nameof(Users));
         }
 
-        // =========================================================
-        //  NY FUNKSJON: SLETT BRUKER
-        // =========================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteUser(string userId)
         {
-            if (string.IsNullOrWhiteSpace(userId))
-            {
-                TempData["Error"] = "Ugyldig bruker-id.";
-                return RedirectToAction(nameof(Users));
-            }
-
-            var currentUserId = _userManager.GetUserId(User);
-            if (string.Equals(currentUserId, userId, StringComparison.Ordinal))
-            {
-                TempData["Error"] = "Du kan ikke slette din egen bruker mens du er innlogget.";
-                return RedirectToAction(nameof(Users));
-            }
-
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
@@ -111,26 +162,22 @@ namespace NRLApp.Controllers
                 return RedirectToAction(nameof(Users));
             }
 
-            // Beskytt hoved-admin-brukere mot sletting
-            if (!string.IsNullOrWhiteSpace(user.Email) &&
-                ProtectedAdminEmails.Contains(user.Email, StringComparer.OrdinalIgnoreCase))
+            var result = await _userManager.DeleteAsync(user);
+            if (!result.Succeeded)
             {
-                TempData["Error"] = "Denne brukeren er systemadministrator og kan ikke slettes.";
+                TempData["Error"] = "Klarte ikke å slette bruker: " +
+                                    string.Join(", ", result.Errors.Select(e => e.Description));
                 return RedirectToAction(nameof(Users));
             }
 
-            var result = await _userManager.DeleteAsync(user);
-
-            if (!result.Succeeded)
+            using (var con = CreateConnection())
             {
-                var msg = string.Join(" ", result.Errors.Select(e => e.Description));
-                TempData["Error"] = $"Klarte ikke å slette brukeren. {msg}";
-            }
-            else
-            {
-                TempData["Status"] = $"Brukeren {user.Email ?? user.UserName} er slettet.";
+                await con.ExecuteAsync(
+                    "DELETE FROM user_organizations WHERE user_id = @UserId;",
+                    new { UserId = userId });
             }
 
+            TempData["Status"] = $"Bruker {user.Email ?? user.UserName} er slettet.";
             return RedirectToAction(nameof(Users));
         }
     }
