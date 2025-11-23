@@ -7,6 +7,9 @@ namespace NRLApp.Controllers
 {
     public class AccountController : Controller
     {
+    /// <summary>
+    /// Ansvarlig for autentisering (LOGIN, REGISTRERING OG UTLOGGING)
+    /// <summary>
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
 
