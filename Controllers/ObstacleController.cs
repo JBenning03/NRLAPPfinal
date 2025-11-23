@@ -11,6 +11,9 @@ using NRLApp.Models.Obstacles;
 
 namespace NRLApp.Controllers
 {
+/// <summary>
+/// Håndterer hele flyten rundt hinder rapportering, innsamlig av metadata, tegning av linje/markør, redigering, godkjenning.
+/// <summary>
     [Authorize]
     public class ObstacleController : Controller
     {
