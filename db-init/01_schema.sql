@@ -70,6 +70,8 @@ CREATE TABLE IF NOT EXISTS user_organizations (
     user_id VARCHAR(255) NOT NULL,
     organization_id INT NOT NULL,
 
+    CONSTRAINT uq_userorg_user UNIQUE (user_id),
+
     CONSTRAINT fk_userorg_org
         FOREIGN KEY (organization_id) REFERENCES organizations(id)
             ON DELETE CASCADE

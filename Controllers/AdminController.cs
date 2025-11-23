@@ -84,7 +84,12 @@ namespace NRLApp.Controllers
                    organization_id AS OrganizationId
             FROM user_organizations;");
 
-                var userOrgMap = userOrgRows.ToDictionary(x => x.UserId, x => x.OrganizationId);
+                var userOrgMap = userOrgRows
+     .GroupBy(x => x.UserId)
+     .ToDictionary(
+         g => g.Key,
+         g => g.First().OrganizationId
+     );
                 ViewBag.UserOrgMap = userOrgMap;
             }
 
