@@ -2,6 +2,10 @@
 
 public class ObstacleListItem
 {
+    /// <summary>
+    /// Minimal representasjon av et hinder slik det vises i tabellen.
+    /// Inneholder også review- og organisasjonsinformasjon til badges
+    /// <summary>
     public int Id { get; set; }
     public string? ObstacleName { get; set; }
     public int? HeightMeters { get; set; }
@@ -13,6 +17,5 @@ public class ObstacleListItem
     public string? CreatedByUserName { get; set; }   // brukes fortsatt i detaljer
     public string? AssignedToUserName { get; set; }
 
-    // NY:
     public string? OrganizationName { get; set; }
 }
