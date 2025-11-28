@@ -8,9 +8,14 @@ using NRLApp.Models;
 
 namespace NRLApp.Controllers
 {
+/// <summary>
+/// Administrasjon av brukere. Viser oversikt, gir roller og knytter brukere til organisasjoner.
+/// Ekslusiv til Admin.
+/// <summary>
     [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
+    
         private static readonly string[] AssignableRoles = new[] { "Pilot", "Crew", "Approver" };
 
         private readonly UserManager<IdentityUser> _userManager;
@@ -61,7 +66,7 @@ namespace NRLApp.Controllers
                 });
             }
 
-            // --- HENT ORGANISASJONER STERKT TYPET ---
+            // --- HENTER ORGANISASJONER ---
             await using (var con = new MySqlConnector.MySqlConnection(
                              _config.GetConnectionString("DefaultConnection")))
             {
@@ -79,7 +84,12 @@ namespace NRLApp.Controllers
                    organization_id AS OrganizationId
             FROM user_organizations;");
 
-                var userOrgMap = userOrgRows.ToDictionary(x => x.UserId, x => x.OrganizationId);
+                var userOrgMap = userOrgRows
+     .GroupBy(x => x.UserId)
+     .ToDictionary(
+         g => g.Key,
+         g => g.First().OrganizationId
+     );
                 ViewBag.UserOrgMap = userOrgMap;
             }
 

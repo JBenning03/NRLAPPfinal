@@ -1,11 +1,17 @@
 ﻿namespace NRLApp.Models.Obstacles
 {
+    /// <summary>
+    /// Filteringsverdier for listesiden.
+    /// <summary>
     public enum ObstacleListStatusFilter
     {
         Draft,
         Pending
     }
 
+    /// <summary>
+    /// Parameterovjer som bygges fra forespørselens query-parametere.
+    /// <summary>
     public sealed class ObstacleListFilter
     {
         public int? Id { get; set; }
@@ -17,6 +23,9 @@
         public DateTime? CreatedTo { get; set; }
     }
 
+    /// <summary>
+    /// Viewmodel for tabellen som vises i Obstacle/List
+    /// <summary>
     public sealed class ObstacleListVm
     {
         public ObstacleListFilter Filter { get; set; } = new();

@@ -60,3 +60,20 @@ CREATE INDEX IF NOT EXISTS idx_obstacles_created_by
 
 CREATE INDEX IF NOT EXISTS idx_obstacles_status
   ON obstacles (review_status);
+
+-- ===========================================
+-- USER ORGANIZATIONS (kobling mellom bruker og organisasjon)
+-- ===========================================
+
+CREATE TABLE IF NOT EXISTS user_organizations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id VARCHAR(255) NOT NULL,
+    organization_id INT NOT NULL,
+
+    CONSTRAINT uq_userorg_user UNIQUE (user_id),
+
+    CONSTRAINT fk_userorg_org
+        FOREIGN KEY (organization_id) REFERENCES organizations(id)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE
+);

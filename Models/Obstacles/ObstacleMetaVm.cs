@@ -2,14 +2,18 @@
 
 namespace NRLApp.Models.Obstacles
 {
-    // Holder GeoJSON mellom trinnene (brukes i TempData i controlleren)
+    /// <summary>
+    /// Holder GeoJSON mellom trinnene (brukes i TempData i controlleren)
+    /// <summary>
     public class DrawState
     {
         public string? GeoJson { get; set; }
     }
 
-    // ViewModel for metadata-skjemaet (trinn 2)
-    // IKKE sealed, slik at vi kan arve fra den i ObstacleEditVm
+    /// <summary>
+    /// ViewModel for metadata-skjemaet.
+    /// Gjort public slik at ObstacleEditVm kan arve feltene.
+    /// <summary
     public class ObstacleMetaVm
     {
         [Display(Name = "Kategori")]
