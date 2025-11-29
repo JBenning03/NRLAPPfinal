@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http; 
 
 namespace NRLApp.Models.Obstacles
 {
     /// <summary>
     /// Holder GeoJSON mellom trinnene (brukes i TempData i controlleren)
-    /// <summary>
+    /// </summary>
     public class DrawState
     {
         public string? GeoJson { get; set; }
@@ -13,7 +14,7 @@ namespace NRLApp.Models.Obstacles
     /// <summary>
     /// ViewModel for metadata-skjemaet.
     /// Gjort public slik at ObstacleEditVm kan arve feltene.
-    /// <summary
+    /// </summary>
     public class ObstacleMetaVm
     {
         [Display(Name = "Kategori")]
@@ -33,8 +34,12 @@ namespace NRLApp.Models.Obstacles
 
         [Display(Name = "Beskrivelse")]
         public string? Description { get; set; }
+        
 
         [Display(Name = "Lagre som utkast")]
         public bool SaveAsDraft { get; set; }
+
+        [Display(Name = "Bilde av hinder (valgfritt)")]
+        public IFormFile? ImageFile { get; set; }
     }
 }

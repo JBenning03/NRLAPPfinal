@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 using MySqlConnector;
 using NRLApp.Models;
 using NRLApp.Models.Obstacles;
+using System.IO;
+using System.Linq;
+using System.IO;
 
 namespace NRLApp.Controllers
 {
@@ -124,6 +127,39 @@ namespace NRLApp.Controllers
             // Hent bruker-ID
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+            // ============================
+            // FILOPPLASTING (valgfritt)
+            // ============================
+            string? imagePath = null;
+
+            if (vm.ImageFile != null && vm.ImageFile.Length > 0)
+            {
+                var ext = Path.GetExtension(vm.ImageFile.FileName).ToLowerInvariant();
+                string[] allowed = { ".jpg", ".jpeg", ".png", ".webp" };
+
+                var isAllowed = Array.IndexOf(allowed, ext) >= 0;
+                if (!isAllowed)
+                {
+                    ModelState.AddModelError(nameof(vm.ImageFile),
+                        "Bare bildefiler (.jpg, .jpeg, .png, .webp) er tillatt.");
+                    return View(vm);
+                }
+
+                var uploadsRoot = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                Directory.CreateDirectory(uploadsRoot);
+
+                var fileName = $"{Guid.NewGuid():N}{ext}";
+                var fullPath = Path.Combine(uploadsRoot, fileName);
+
+                using (var stream = System.IO.File.Create(fullPath))
+                {
+                    await vm.ImageFile.CopyToAsync(stream);
+                }
+
+                // Lagres som relativ sti fra wwwroot
+                imagePath = Path.Combine("uploads", fileName).Replace("\\", "/");
+            }
+
             await using var con = CreateConnection();
 
             // Finn organisasjon for brukeren (hvis satt)
@@ -147,6 +183,7 @@ INSERT INTO obstacles (
     obstacle_category,
     height_m,
     obstacle_description,
+    image_path,
     is_draft,
     created_utc,
     created_by_user_id,
@@ -158,6 +195,7 @@ VALUES (
     @Category,
     @HeightM,
     @Descr,
+    @ImagePath,
     @IsDraft,
     UTC_TIMESTAMP(),
     @CreatedByUserId,
@@ -172,6 +210,7 @@ VALUES (
                 Category = vm.Category,
                 HeightM = (int?)Math.Round(heightMeters, 0),
                 Descr = vm.Description,
+                ImagePath = imagePath,
                 IsDraft = isDraft ? 1 : 0,
                 CreatedByUserId = userId,
                 OrganizationId = orgId
@@ -356,12 +395,14 @@ SELECT o.id,
        o.obstacle_name        AS ObstacleName,
        o.height_m             AS HeightMeters,
        o.obstacle_description AS Description,
+       o.image_path           AS ImagePath,
        o.is_draft             AS IsDraft,
        o.created_utc          AS CreatedUtc,
        o.review_status        AS ReviewStatus,
        o.review_comment       AS ReviewComment,
        createdUser.UserName   AS CreatedByUserName,
        assignedUser.UserName  AS AssignedToUserName
+
 FROM obstacles o
 LEFT JOIN AspNetUsers createdUser  ON createdUser.Id = o.created_by_user_id
 LEFT JOIN AspNetUsers assignedUser ON assignedUser.Id = o.assigned_to_user_id

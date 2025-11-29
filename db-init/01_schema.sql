@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS obstacles (
   obstacle_category    VARCHAR(100)  NULL, 
   height_m             INT           NULL,
   obstacle_description TEXT          NULL,
+  image_url            VARCHAR(500)  NULL,
   is_draft             TINYINT(1)    NOT NULL DEFAULT 0,
   created_utc          DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -38,6 +39,7 @@ CREATE TABLE IF NOT EXISTS obstacles (
   assigned_to_user_id  VARCHAR(255)  NULL,
   review_status        VARCHAR(50)   NULL,
   review_comment       TEXT          NULL,
+  image_path           VARCHAR(255)  NULL,
   organization_id      INT           NULL,
 
   -- (valgfri FK i logisk forstand; vi dropper hard FK mot AspNetUsers

@@ -12,8 +12,14 @@
         <div></div>
     </div>
 
-    <form asp-action="Meta" method="post" class="meta-form">
+    <form asp-action="Meta" method="post" enctype="multipart/form-data" class="meta-form">
         @Html.AntiForgeryToken()
+
+        <div class="form-group">
+            <label asp-for="ImageFile">Bilde av hinder (valgfritt)</label>
+            <input asp-for="ImageFile" type="file" class="form-control" />
+            <span asp-validation-for="ImageFile" class="text-danger"></span>
+        </div>
 
         <!-- NY: Kategori-dropdown -->
         <div class="form-group">
