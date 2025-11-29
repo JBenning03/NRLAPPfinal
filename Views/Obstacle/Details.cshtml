@@ -140,7 +140,7 @@
                         <dt class="details-label">Registrert</dt>
                         <dd class="details-value">
                             @(Model.CreatedUtc.ToLocalTime()
-                                                        .ToString("yyyy-MM-dd HH:mm", CultureInfo.CurrentCulture))
+                                    .ToString("yyyy-MM-dd HH:mm", CultureInfo.CurrentCulture))
                         </dd>
                     </div>
 
@@ -148,13 +148,32 @@
                         <dt class="details-label">Beskrivelse</dt>
                         <dd class="details-value">
                             @(
-                                                        string.IsNullOrWhiteSpace(Model.Description)
-                                                        ? "-"
-                                                        : Model.Description
-                                                        )
+                                    string.IsNullOrWhiteSpace(Model.Description)
+                                    ? "-"
+                                    : Model.Description
+                                    )
                         </dd>
                     </div>
+                    @* FIX: Wrap markup in braces for control-flow statement *@
+                    @if (!string.IsNullOrWhiteSpace(Model.ImagePath))
+                    {
+                        <div class="details-row">
+                            <div class="details-label">Bilde</div>
+                            <div class="details-value">
+                                <button type="button"
+                                        class="btn btn-primary btn-sm"
+                                        id="showImageBtn">
+                                    Vis
+                                </button>
 
+                                <div id="imageSection" class="mt-2 d-none">
+                                    <img src="@Url.Content("~/" + Model.ImagePath)"
+                                         alt="Bilde av hinderet"
+                                         class="img-fluid rounded" />
+                                </div>
+                            </div>
+                        </div>
+                    }
                     <div class="details-row">
                         <dt class="details-label">Saksstatus</dt>
                         <dd class="details-value">@statusText</dd>
@@ -285,5 +304,28 @@
 
             setTimeout(() => map.invalidateSize(), 80);
         })();
+    </script>
+
+    <!-- NYTT: toggle for "Vis bilde"-knappen -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var btn = document.getElementById("showImageBtn");
+            var section = document.getElementById("imageSection");
+
+            if (btn && section) {
+                btn.addEventListener("click", function () {
+
+                    // Vis/skjul selve bildet
+                    section.classList.toggle("d-none");
+
+                    // Endre knappetekst
+                    if (section.classList.contains("d-none")) {
+                        btn.textContent = "Vis";
+                    } else {
+                        btn.textContent = "Skjul";
+                    }
+                });
+            }
+        });
     </script>
 }
